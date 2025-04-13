@@ -1,0 +1,85 @@
+# DDP
+gpus: "4,5"
+flag: train
+
+# Log
+log_dir: "./log/output_dir"
+
+# Task
+if_predict_label: false
+if_predict_mask: true
+
+# Model
+model:
+  name: DiffIML
+  # Model specific setting
+  prior_rate: 0.1
+  pretrain: true
+  seg_weight: 0.2
+  infer_time: 5
+  backbone: segformer_b3
+  num_inference_steps: 8
+
+# Train dataset
+train_dataset:
+  name: JsonDataset
+  dataset_name: CASIAv2
+  image_size: 512
+  path: /mnt/data0/public_datasets/IML/coverage_full.json
+  # Dataset specific setting
+  is_resizing: true
+  is_padding: false
+  edge_mask_width: 7
+#  Test dataset (one or many)
+test_dataset:
+  - name: JsonDataset
+    dataset_name: CASIAv1
+    image_size: 512
+    path: /mnt/data0/public_datasets/IML/coverage_full.json
+    # Dataset specific setting
+    is_resizing: true
+    is_padding: false
+    edge_mask_width: 7
+
+# Transform
+transform:
+  name: IMDLTransform
+
+# Training related
+batch_size: 4
+test_batch_size: 2
+epochs: 200
+accum_iter: 1
+
+# Test related
+no_model_eval: false
+test_period: 4
+
+# Logging & TensorBoard
+log_per_epoch_count: 20
+
+# DDP & AMP settings
+find_unused_parameters: true
+if_not_amp: true
+
+# Optimizer parameters
+weight_decay: 0.05
+lr: 1e-4
+blr: 0.001
+min_lr: 0.0
+warmup_epochs: 2
+
+# Device and training control
+device: "cuda"
+seed: 42
+resume: ""
+start_epoch: 0
+num_workers: 8
+pin_mem: true
+
+# Distributed training parameters
+world_size: 1
+local_rank: -1
+dist_on_itp: false
+dist_url: "env://"
+
