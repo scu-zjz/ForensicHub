@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from typing import Dict, Any, Optional
 
+
 class BaseModel(nn.Module):
     """Base class for all models in UniForensicsBench.
     
@@ -9,18 +10,17 @@ class BaseModel(nn.Module):
     for all models. The model should take at least an image as input
     and return a dictionary containing the necessary outputs.
     """
-    
+
     def __init__(self):
         super().__init__()
-        
-    def forward(self, data_dict: Dict[str, Any]) -> Dict[str, Any]:
+
+    def forward(self, **kwargs) -> Dict[str, Any]:
         """Forward pass of the model.
         
         Args:
-            data_dict (Dict[str, Any]): Dictionary containing input data.
-                Must contain at least:
-                    - 'image': Input image tensor
+            **kwargs (Dict[str, Any]): Dictionary containing input data.
                 May contain (Consistent with the input from the dataset):
+                    - 'image': Input image tensor
                     - 'mask': Ground truth mask
                     - 'label': Ground truth label
                     - Other model-specific inputs
@@ -32,7 +32,7 @@ class BaseModel(nn.Module):
                 May contain:
                     - 'pred_mask': Predicted mask
                     - 'pred_label': Predicted label
-                Visualize:
+                Visualize (Optional):
                     - 'visual_loss': Automatically visualize with the key-value pairs 
                     eg. {
                         "predict_loss": predict_loss,
@@ -46,9 +46,23 @@ class BaseModel(nn.Module):
                         "pred_label": pred_label
                     }
                     - Other model-specific outputs
+
+                return eg.
+                {
+                    "backward_loss": combined_loss,
+
+                    # optional below
+                    "pred_mask": mask_pred,
+                    "visual_loss": {
+                        "combined_loss": combined_loss
+                    },
+                    "visual_image": {
+                        "pred_mask": mask_pred,
+                    }
+                }
         """
         raise NotImplementedError("Subclasses must implement forward method")
-        
+
     def get_prediction(self, data_dict: Dict[str, Any]) -> Dict[str, Any]:
         """Get model prediction without computing loss.
         
@@ -65,8 +79,8 @@ class BaseModel(nn.Module):
                     - 'pred': Model prediction
         """
         with torch.no_grad():
-            return self.forward(data_dict)
-            
+            return self.forward(**data_dict)
+
     def compute_loss(self, data_dict: Dict[str, Any], output_dict: Dict[str, Any]) -> torch.Tensor:
         """Compute loss for training.
         
@@ -78,7 +92,7 @@ class BaseModel(nn.Module):
             torch.Tensor: Loss value
         """
         raise NotImplementedError("Subclasses must implement compute_loss method")
-        
+
     def get_metrics(self, data_dict: Dict[str, Any], output_dict: Dict[str, Any]) -> Dict[str, float]:
         """Compute metrics for evaluation.
         

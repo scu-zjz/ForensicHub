@@ -13,12 +13,13 @@ if_predict_mask: true
 model:
   name: DiffIML
   # Model specific setting
-  prior_rate: 0.1
-  pretrain: true
-  seg_weight: 0.2
-  infer_time: 5
-  backbone: segformer_b3
-  num_inference_steps: 8
+  init_config:
+    prior_rate: 0.1
+    pretrain: true
+    seg_weight: 0.2
+    infer_time: 5
+    backbone: segformer_b3
+    num_inference_steps: 8
 
 # Train dataset
 train_dataset:

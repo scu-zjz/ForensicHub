@@ -1,6 +1,6 @@
 #!/bin/bash
 
-yaml_config="/mnt/data1/dubo/workspace/UniForensicsBench/statics/test.yaml"
+yaml_config="/mnt/data1/dubo/workspace/UniForensicsBench/UniForensicsBench/statics/aigc/train_resnet.yaml"
 
 # 从 yaml 中读取 gpus、log_dir 和 flag
 gpus=$(python -c "import yaml; print(yaml.safe_load(open('$yaml_config'))['gpus'])")

@@ -32,8 +32,10 @@ def test_one_loader(model: torch.nn.Module,
         # Forwarding on model
         output_dict = model(**data_dict)
         # results
-        mask_pred = output_dict['pred_mask']
-        label_pred = output_dict['pred_label']
+        if output_dict['pred_mask'] is not None:
+            mask_pred = output_dict['pred_mask']
+        if output_dict['pred_label'] is not None:
+            label_pred = output_dict['pred_label']
 
         # ---- Training evaluation ----
         # batch update in a evaluator
@@ -185,10 +187,13 @@ def test_one_epoch(model: torch.nn.Module,
                 for evaluator in evaluator_list:
                     log_writer.add_scalar(f'{name}_test_evaluators/{evaluator.name}',
                                           metric_logger.meters[evaluator.name].global_avg, epoch)
-            log_writer.add_images(f'{name}_test/image', denormalize(data_dict['image']), epoch)
-            log_writer.add_images(f'{name}_test/predict', output_dict['pred_mask'] * 1.0, epoch)
-            log_writer.add_images(f'{name}_test/predict_threshold_0.5', (output_dict['pred_mask'] > 0.5) * 1.0, epoch)
-            log_writer.add_images(f'{name}_test/mask', data_dict['mask'], epoch)
+            if data_dict.get('image') is not None:
+                log_writer.add_images(f'{name}_test/image', denormalize(data_dict['image']), epoch)
+            if data_dict.get('pred_mask') is not None:
+                log_writer.add_images(f'{name}_test/predict', output_dict['pred_mask'] * 1.0, epoch)
+                log_writer.add_images(f'{name}_test/predict_threshold_0.5', (output_dict['pred_mask'] > 0.5) * 1.0, epoch)
+            if data_dict.get('mask') is not None:
+                log_writer.add_images(f'{name}_test/mask', data_dict['mask'], epoch)
             # log_writer.add_images('test/edge_mask', edge_mask, epoch)
 
         print("Averaged stats:", metric_logger)

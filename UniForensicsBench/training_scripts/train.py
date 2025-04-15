@@ -23,6 +23,7 @@ def get_args_parser():
     args = parser.parse_args()
     config = load_yaml_config(args.config)
 
+    # model_args, train_dataset_args, transform_args are dict type, test_dataset_args is dict list.
     args, model_args, train_dataset_args, test_dataset_args, transform_args = split_config(config)
     add_attr(args, output_dir=args.log_dir)
     return args, model_args, train_dataset_args, test_dataset_args, transform_args
@@ -36,8 +37,6 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
     print('job dir: {}'.format(os.path.dirname(os.path.realpath(__file__))))
     print("=====args:=====")
     print("{}".format(args).replace(', ', ',\n'))
-    print("=====Model args:=====")
-    print("{}".format(model_args).replace(', ', ',\n'))
     device = torch.device(args.device)
 
     # fix the seed for reproducibility
@@ -54,7 +53,7 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
     print("Test transform: ", test_transform)
 
     # get post function (if have)
-    post_function_name = f"{model_args.name}_post_func".lower()
+    post_function_name = f"{model_args['name']}_post_func".lower()
     print(f"Post function check: {post_function_name}")
     print(POSTFUNCS)
     if POSTFUNCS.has(post_function_name):
@@ -62,18 +61,23 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
     else:
         post_function = None
 
-    add_attr(train_dataset_args, post_funcs=post_function, common_transform=train_transform)
+    train_dataset_args["init_config"].update({
+        "post_funcs": post_function,
+        "common_transform": train_transform
+    })
     train_dataset = build_from_registry(DATASETS, train_dataset_args)
 
-    test_dataset_list = {
-        test_args.dataset_name: build_from_registry(DATASETS, add_attr(test_args, post_funcs=post_function,
-                                                                       common_transform=test_transform))
-        for test_args in test_dataset_args
-    }
+    test_dataset_list = {}
+    for test_args in test_dataset_args:
+        test_args["init_config"].update({
+            "post_funcs": post_function,
+            "common_transform": test_transform
+        })
+        test_dataset_list[test_args["dataset_name"]] = build_from_registry(DATASETS, test_args)
 
-    print(f"Train dataset: {train_dataset_args.dataset_name}.")
+    print(f"Train dataset: {train_dataset_args['dataset_name']}.")
     print(len(train_dataset))
-    print(f"Test dataset: {[args.dataset_name for args in test_dataset_args]}.")
+    print(f"Test dataset: {[args['dataset_name'] for args in test_dataset_args]}.")
     print([len(dataset) for dataset in test_dataset_list.values()])
 
     test_sampler = {}
@@ -134,8 +138,8 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
     Available evaluators are in: https://github.com/scu-zjz/IMDLBenCo/blob/main/IMDLBenCo/evaluation/__init__.py
     """
     evaluator_list = [
-        PixelF1(threshold=0.5, mode="origin"),
-        # ImageF1(threshold=0.5)
+        # PixelF1(threshold=0.5, mode="origin"),
+        ImageF1(threshold=0.5)
     ]
 
     if args.distributed:

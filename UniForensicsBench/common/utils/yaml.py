@@ -48,13 +48,31 @@ def split_config(config):
     transform_args = config.pop("transform", {})
     args = config  # 剩下的就是全局 args
 
+    if "init_config" not in model_args:
+        model_args["init_config"] = {}
+    for x in test_dataset_args:
+        if "init_config" not in x:
+            x["init_config"] = {}
+    if "init_config" not in train_dataset_args:
+        train_dataset_args["init_config"] = {}
+    if "init_config" not in transform_args:
+        transform_args["init_config"] = {}
+
     return (
         dict_to_namespace(args),
-        dict_to_namespace(model_args),
-        dict_to_namespace(train_dataset_args),
-        [dict_to_namespace(td) for td in test_dataset_args],
-        dict_to_namespace(transform_args),
+        model_args,
+        train_dataset_args,
+        test_dataset_args,
+        transform_args
     )
+
+    # return (
+    #     dict_to_namespace(args),
+    #     dict_to_namespace(model_args),
+    #     dict_to_namespace(train_dataset_args),
+    #     [dict_to_namespace(td) for td in test_dataset_args],
+    #     dict_to_namespace(transform_args),
+    # )
 
 
 def add_attr(ns, **kwargs):

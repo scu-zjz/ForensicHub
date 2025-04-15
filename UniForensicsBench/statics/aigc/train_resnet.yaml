@@ -1,0 +1,76 @@
+# DDP
+gpus: "4,5"
+flag: train
+
+# Log
+log_dir: "./log/aigc_resnet_df_train"
+
+# Task
+if_predict_label: true
+if_predict_mask: false
+
+# Model
+model:
+  name: Resnet50
+  # Model specific setting
+  init_config:
+    pretrained: true
+    num_classes: 1
+
+# Train dataset
+train_dataset:
+  name: AIGCLabelDataset
+  dataset_name: DiffusionForensics_train
+  init_config:
+    image_size: 224
+    path: /mnt/data1/public_datasets/AIGC/DiffusionForensics/images/train.json
+#  Test dataset (one or many)
+test_dataset:
+  - name: AIGCLabelDataset
+    dataset_name: DiffusionForensics_test
+    init_config:
+      image_size: 224
+      path: /mnt/data1/public_datasets/AIGC/DiffusionForensics/images/test.json
+
+# Transform
+transform:
+  name: AIGCTransform
+
+# Training related
+batch_size: 512
+test_batch_size: 4
+epochs: 10
+accum_iter: 1
+
+# Test related
+no_model_eval: false
+test_period: 1
+
+# Logging & TensorBoard
+log_per_epoch_count: 1
+
+# DDP & AMP settings
+find_unused_parameters: true
+if_not_amp: true
+
+# Optimizer parameters
+weight_decay: 0.05
+lr: 1e-4
+blr: 0.001
+min_lr: 0.001
+warmup_epochs: 1
+
+# Device and training control
+device: "cuda"
+seed: 42
+resume: ""
+start_epoch: 0
+num_workers: 8
+pin_mem: true
+
+# Distributed training parameters
+world_size: 1
+local_rank: -1
+dist_on_itp: false
+dist_url: "env://"
+

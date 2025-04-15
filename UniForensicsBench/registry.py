@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from collections import abc
 from typing import Dict, List, Optional, Type, Union, Any
 import inspect
 
@@ -6,7 +7,6 @@ import difflib
 from rich.console import Console
 from rich.table import Table
 
-from UniForensicsBench.common.utils.misc import is_seq_of
 from UniForensicsBench.core.base_dataset import BaseDataset
 from UniForensicsBench.core.base_model import BaseModel
 from UniForensicsBench.core.base_transform import BaseTransform
@@ -185,15 +185,59 @@ def register_postfunc(name: Optional[Union[str, List[str]]] = None, force: bool 
 
 
 def build_from_registry(registry, config_args):
-    cls = registry.get(config_args.name)
-    kwargs = vars(config_args).copy()
-    kwargs.pop("name", None)
+    # 从字典中获取 class 名称
+    name = config_args["name"]  # 直接从字典中访问
+    cls = registry.get(name)
+    if cls is None:
+        raise ValueError(f"Class '{name}' not found in registry.")
 
-    # 获取 __init__ 的参数名（除了 self）
-    sig = inspect.signature(cls.__init__)
-    valid_params = set(sig.parameters.keys()) - {"self"}
+    # 获取 config 字典中的参数
+    if "init_config" in config_args:
+        config = config_args.get("init_config", {})  # 从字典中获取 config 部分
+    else:
+        config = {}
 
-    # 只保留目标类真正需要的参数
-    filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_params}
-    print(filtered_kwargs)
-    return cls(**filtered_kwargs)
+    # 处理额外的参数：比如如果参数是字符串 "true"，可以转化为布尔值
+    for k, v in config.items():
+        if isinstance(v, str):
+            if v.lower() == "true":
+                config[k] = True
+            elif v.lower() == "false":
+                config[k] = False
+
+    print(f"[build_from_registry] Creating model '{name}' with args: {config}")
+    return cls(**config)
+
+
+def is_seq_of(seq: Any,
+              expected_type: Union[Type, tuple],
+              seq_type: Type = None) -> bool:
+    """Check whether it is a sequence of some type.
+
+    Args:
+        seq (Sequence): The sequence to be checked.
+        expected_type (type or tuple): Expected type of sequence items.
+        seq_type (type, optional): Expected sequence type. Defaults to None.
+
+    Returns:
+        bool: Return True if ``seq`` is valid else False.
+
+    Examples:
+        >>> from mmengine.utils import is_seq_of
+        >>> seq = ['a', 'b', 'c']
+        >>> is_seq_of(seq, str)
+        True
+        >>> is_seq_of(seq, int)
+        False
+    """
+    if seq_type is None:
+        exp_seq_type = abc.Sequence
+    else:
+        assert isinstance(seq_type, type)
+        exp_seq_type = seq_type
+    if not isinstance(seq, exp_seq_type):
+        return False
+    for item in seq:
+        if not isinstance(item, expected_type):
+            return False
+    return True

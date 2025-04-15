@@ -1,0 +1,1 @@
+from .aigc_transforms import AIGCTransform
