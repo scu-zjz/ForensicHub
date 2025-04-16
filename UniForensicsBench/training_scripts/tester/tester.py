@@ -32,14 +32,17 @@ def test_one_loader(model: torch.nn.Module,
         # Forwarding on model
         output_dict = model(**data_dict)
         # results
-        if output_dict['pred_mask'] is not None:
+        predict = None
+        if output_dict.get('pred_mask') is not None:
             mask_pred = output_dict['pred_mask']
-        if output_dict['pred_label'] is not None:
+            predict = mask_pred
+        if output_dict.get('pred_label') is not None:
             label_pred = output_dict['pred_label']
+            predict = label_pred
 
         # ---- Training evaluation ----
         # batch update in a evaluator
-        BATCHSIZE, _, _, _ = mask_pred.shape
+        BATCHSIZE = predict.shape[0]
         if BATCHSIZE != args.test_batch_size:
             print("=" * 20)
             print(
@@ -48,8 +51,8 @@ def test_one_loader(model: torch.nn.Module,
 
         for evaluator in evaluator_list:
             results = evaluator.batch_update(
-                predict=mask_pred,
-                predict_label=label_pred,
+                **({"predict": output_dict["pred_mask"]} if output_dict.get("pred_mask") is not None else {}),
+                **({"predict_label": output_dict["pred_label"]} if output_dict.get("pred_label") is not None else {}),
                 **data_dict
             )
             if results == None:  # Image-level results, do nothing
@@ -191,7 +194,8 @@ def test_one_epoch(model: torch.nn.Module,
                 log_writer.add_images(f'{name}_test/image', denormalize(data_dict['image']), epoch)
             if data_dict.get('pred_mask') is not None:
                 log_writer.add_images(f'{name}_test/predict', output_dict['pred_mask'] * 1.0, epoch)
-                log_writer.add_images(f'{name}_test/predict_threshold_0.5', (output_dict['pred_mask'] > 0.5) * 1.0, epoch)
+                log_writer.add_images(f'{name}_test/predict_threshold_0.5', (output_dict['pred_mask'] > 0.5) * 1.0,
+                                      epoch)
             if data_dict.get('mask') is not None:
                 log_writer.add_images(f'{name}_test/mask', data_dict['mask'], epoch)
             # log_writer.add_images('test/edge_mask', edge_mask, epoch)

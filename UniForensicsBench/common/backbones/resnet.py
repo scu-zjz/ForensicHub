@@ -167,7 +167,7 @@ class ResNet(BaseModel):
         combined_loss = torch.nn.functional.binary_cross_entropy_with_logits(x, label)
         data_dict = {
             "backward_loss": combined_loss,
-
+            "pred_label": x.sigmoid(),
             # optional below
             "visual_loss": {
                 "combined_loss": combined_loss

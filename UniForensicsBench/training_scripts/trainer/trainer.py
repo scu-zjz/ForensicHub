@@ -108,16 +108,17 @@ def train_one_epoch(model: torch.nn.Module,
         mask = data_dict['mask']
 
     if log_writer is not None:
-        if samples is not None:
+        if output_dict.get('image') is not None:
             log_writer.add_images('train/image', denormalize(samples), epoch)
-        if mask_pred is not None:
+        if output_dict.get('pred_mask') is not None:
             log_writer.add_images('train/predict', mask_pred, epoch)
             log_writer.add_images('train/predict_thresh_0.5', (mask_pred > 0.5) * 1.0, epoch)
-        if mask is not None:
+        if output_dict.get('pred_mask') is not None:
             log_writer.add_images('train/gt_mask', mask, epoch)
 
-        for k, v in visual_image.items():
-            log_writer.add_images(f'train/{k}', v, epoch)
+        if output_dict.get('visual_image') is not None:
+            for k, v in visual_image.items():
+                log_writer.add_images(f'train/{k}', v, epoch)
 
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()
