@@ -1,10 +1,11 @@
-from .temp import cal_confusion_matrix, genertate_region_mask, cal_F1
-from .abstract_class import AbstractEvaluator
-from .F1 import ImageF1, PixelF1
-from .AUC import ImageAUC, PixelAUC
-from .IOU import PixelIOU
-from .Accuracy import ImageAccuracy, PixelAccuracy
-from .gradcam.grad_camera_visualize import grad_camera_visualize
+# from .temp import cal_confusion_matrix, genertate_region_mask, cal_F1
+# from .abstract_class import AbstractEvaluator
+# from .F1 import ImageF1, PixelF1
+# from .AUC import ImageAUC, PixelAUC
+# from .IOU import PixelIOU
+# from .Accuracy import ImageAccuracy, PixelAccuracy
+# from .gradcam.grad_camera_visualize import grad_camera_visualize
+from IMDLBenCo.evaluation import *
 
 __all__ = [
     # Below for develop
