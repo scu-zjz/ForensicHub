@@ -5,10 +5,25 @@ import requests
 from colorama import init, Fore, Style
 
 # from ForensicHub.utils.paths import BencoPath
-from ForensicHub.cli_funcs import cli_init, cli_guide, cli_data
+from ForensicHub.cli_funcs import (
+    cli_init,
+    cli_guide, 
+    cli_data,
+    cli_train,
+    cli_test
+)
 import importlib.metadata 
 
+COMMAND_MAP = {
+    'init': cli_init,
+    'guide': cli_guide,
+    'data': cli_data,
+    'train': cli_train,
+    'test': cli_test
+}
+
 PYPI_API_URL = 'https://pypi.org/pypi/ForensicHub/json'
+
 from ForensicHub.version import __version__
 
 def version_and_check_for_updates():
@@ -49,40 +64,52 @@ def main():
     parser_init_base = init_subparsers.add_parser('base', help='Initialize the base environment')
     parser_init_base.set_defaults(subcommand='base')
 
-    # init model_zoo
-    parser_init_model_zoo = init_subparsers.add_parser('model_zoo', help='Initialize the model zoo')
+    # 目前还不知道要init什么东西，先注释掉
+    # # init model_zoo
+    # parser_init_model_zoo = init_subparsers.add_parser('model_zoo', help='Initialize the model zoo')
     
-    # init backbone
-    parser_init_backbone = init_subparsers.add_parser('backbone', help='Initialize the backbone')
+    # # init backbone
+    # parser_init_backbone = init_subparsers.add_parser('backbone', help='Initialize the backbone')
     
+    """
+    通过命令行形式启动训练，传入配置文件路径
+    forhub train ./configs/train.yaml
+    """
+    # train command
+    parser_train = subparsers.add_parser('train', help='Train the model with given path to yaml')
+    parser_train.add_argument('yaml', type=str, help='Path to the configuration file')
+
+    # test command
+    parser_test = subparsers.add_parser('test', help='Test the model with given path to yaml')
+    parser_test.add_argument('yaml', type=str, help='Path to the configuration file')
     
-    # guide command
-    parser_guide = subparsers.add_parser('guide', help='Guide for using the tool')
-    
-    # data command
-    parser_data = subparsers.add_parser('data', help='Manage data')
-    
-    parser.add_argument('--config', type=str, help='Path to the configuration file')
+    # parser.add_argument('--config', type=str, help='Path to the configuration file')
     
     args = parser.parse_args()
+    
     if args.version:
         version_and_check_for_updates()
     
     if args.command == 'init':
         if args.subcommand is None:
             args.subcommand = 'base'
-        cli_init(args.config, subcommand=args.subcommand)
+        cli_init(subcommand=args.subcommand)
+    elif args.command == 'train':
+        cli_train(args.yaml)
+    elif args.command == 'test':
+        cli_test(args.yaml)
+
         
-    elif args.command == 'guide':
-        cli_guide(args.config)
-    elif args.command == 'data':
-        cli_data(args.config)
+    # elif args.command == 'guide':
+    #     cli_guide(args.config)
+    # elif args.command == 'data':
+    #     cli_data(args.config)
 
-def train(config):
-    print(f'Training with config: {config}')
+# def train(config):
+#     print(f'Training with config: {config}')
 
-def evaluate(config):
-    print(f'Evaluating with config: {config}')
+# def evaluate(config):
+#     print(f'Evaluating with config: {config}')
 
 if __name__ == '__main__':
     main()

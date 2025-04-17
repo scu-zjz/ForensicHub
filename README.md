@@ -1,8 +1,30 @@
 # ForensicHub: All-in-one solution for fake image detection!
+## 开发用链接：
+- [文档Github仓库](https://github.com/scu-zjz/ForensicHub-doc)
+- [文档的主页](https://scu-zjz.github.io/ForensicHub-doc/)
+- [PyPi](https://pypi.org/project/forensichub/)
+## Reference链接
+- [DeepfakeBench原生仓库](https://github.com/SCLBD/DeepfakeBench)
+- [DeepfakeBench我们版本](https://github.com/scu-zjz/DeepfakeBench)
+- [AIGCBench](https://github.com/Ekko-zn/AIGCDetectBenchmark?tab=readme-ov-file)
+
 ## Local install
+本地开发者安装（实时更新）
+需要先切换到clone下来的ForensicHub的路径下，然后执行如下命令
 ```shell
-pip install forensichub
+pip install -e .
 ```
+目前pypi仅仅用于站坑，暂时不要从pypi直接安装。
+
+## One-line Training/testing
+```
+forhub train /mnt/data0/xiaochen/workspace/fornhub/ForensicHub/ForensicHub/statics/aigc/train_resnet.yaml
+```
+
+```
+forhub test /mnt/data0/xiaochen/workspace/fornhub/ForensicHub/ForensicHub/statics/aigc/test_resnet.yaml
+```
+
 ## Command Line
 查看版本
 ```

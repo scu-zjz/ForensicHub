@@ -3,6 +3,6 @@ from colorama import init, Fore, Style
 from IMDLBenCo.utils.paths import BencoPath
 from .copy import copy_files, copy_file 
 
-def cli_data(config):
+def cli_data():
     print("This is data cli.")
     # TODO
