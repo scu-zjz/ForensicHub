@@ -28,12 +28,14 @@ class AbstractDataset(BaseDataset):
                  is_resizing=False,
                  image_size=1024,
                  # output_size=(1024, 1024),
-                 common_transforms=None,
+                 common_transform=None,
                  edge_mask_width=None,
                  img_loader=pil_loader,
-                 post_funcs=None
+                 post_funcs=None,
+                 post_transform=None,
                  ) -> None:
-        super().__init__(path, transform=common_transforms, img_loader=img_loader, post_funcs=post_funcs)
+        super().__init__(path, transform=common_transform, img_loader=img_loader, post_funcs=post_funcs,
+                         post_transform=post_transform)
 
         output_size = (image_size, image_size)
 
@@ -43,7 +45,7 @@ class AbstractDataset(BaseDataset):
             raise AttributeError("is_padding and is_resizing can not be False at the same time")
 
         # Padding or Resizing
-        self.post_transform = None
+        self.post_transform = post_transform
         if is_padding == True:
             self.post_transform = get_albu_transforms(type_="pad", output_size=output_size)
         if is_resizing == True:
@@ -54,7 +56,7 @@ class AbstractDataset(BaseDataset):
         self.output_size = output_size
 
         # Common augmentations for augmentation
-        self.common_transforms = common_transforms
+        self.common_transform = common_transform
         # Edge mask generator
         self.edge_mask_generator = None if edge_mask_width is None else EdgeMaskGenerator(edge_mask_width)
 
@@ -91,8 +93,8 @@ class AbstractDataset(BaseDataset):
         gt_img = np.array(gt_img)  # H W C
 
         # Do augmentations
-        if self.common_transforms != None:
-            res_dict = self.common_transforms(image=tp_img, mask=gt_img)
+        if self.common_transform != None:
+            res_dict = self.common_transform(image=tp_img, mask=gt_img)
             tp_img = res_dict['image']
             gt_img = res_dict['mask']
             # copy_move may cause the label change, so we need to update the label

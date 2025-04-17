@@ -34,6 +34,30 @@ test_dataset:
       # Dataset specific setting
       is_resizing: true
       is_padding: false
+  - name: JsonDataset
+    dataset_name: Columbia
+    init_config:
+      image_size: 224
+      path: /mnt/data0/public_datasets/IML/Columbia_full.json
+      # Dataset specific setting
+      is_resizing: true
+      is_padding: false
+  - name: JsonDataset
+    dataset_name: IMD2020
+    init_config:
+      image_size: 224
+      path: /mnt/data0/public_datasets/IML/IMD_20_1024_full.json
+      # Dataset specific setting
+      is_resizing: true
+      is_padding: false
+  - name: JsonDataset
+    dataset_name: NIST16
+    init_config:
+      image_size: 224
+      path: /mnt/data0/public_datasets/IML/NIST16_full.json
+      # Dataset specific setting
+      is_resizing: true
+      is_padding: false
 
 # Transform
 transform:

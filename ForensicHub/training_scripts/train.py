@@ -10,7 +10,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 import ForensicHub.training_scripts.utils.misc as misc
 from ForensicHub.registry import DATASETS, MODELS, POSTFUNCS, TRANSFORMS, build_from_registry
-from ForensicHub.common.evalcommon_transformsuation import PixelF1, ImageF1
+from ForensicHub.common.evaluation import PixelF1, ImageF1
 from ForensicHub.training_scripts.tester import test_one_epoch
 from ForensicHub.training_scripts.trainer import train_one_epoch
 from ForensicHub.common.utils.yaml import load_yaml_config, split_config, add_attr
@@ -46,11 +46,13 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
     np.random.seed(seed)
 
     transform = build_from_registry(TRANSFORMS, transform_args)
-    train_transform = transform.get_train_transform
-    test_transform = transform.get_test_transform
+    train_transform = transform.get_train_transform()
+    test_transform = transform.get_test_transform()
+    post_transform = transform.get_post_transform()
 
     print("Train transform: ", train_transform)
     print("Test transform: ", test_transform)
+    print("Post transform: ", post_transform)
 
     # get post function (if have)
     post_function_name = f"{model_args['name']}_post_func".lower()
@@ -63,7 +65,8 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
 
     train_dataset_args["init_config"].update({
         "post_funcs": post_function,
-        "common_transforms": train_transform
+        "common_transform": train_transform,
+        "post_transform": post_transform
     })
     train_dataset = build_from_registry(DATASETS, train_dataset_args)
 
@@ -71,7 +74,8 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
     for test_args in test_dataset_args:
         test_args["init_config"].update({
             "post_funcs": post_function,
-            "common_transforms": test_transform
+            "common_transform": test_transform,
+            "post_transform": post_transform
         })
         test_dataset_list[test_args["dataset_name"]] = build_from_registry(DATASETS, test_args)
 

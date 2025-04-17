@@ -46,11 +46,13 @@ class AIGCLabelDataset(BaseDataset):
         # Load image
         image = Image.open(image_path).convert("RGB")
         image = image.resize((self.image_size, self.image_size))
-        image = torch.from_numpy(np.array(image)).permute(2, 0, 1).float() / 255.0
+        image = np.array(image)
 
         # Apply transforms
-        if self.common_transforms:
-            image = self.common_transforms(image)
+        if self.common_transform:
+            image = self.common_transform(image=image)['image']
+        if self.post_transform:
+            image = self.post_transform(image=image)['image']
 
         output = {
             "image": image,

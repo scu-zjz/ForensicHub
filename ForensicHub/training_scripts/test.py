@@ -40,7 +40,8 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
     device = torch.device(args.device)
 
     transform = build_from_registry(TRANSFORMS, transform_args)
-    test_transform = transform.get_test_transform
+    test_transform = transform.get_test_transform()
+    post_transform = transform.get_post_transform()
 
     if args.distributed:
         num_tasks = misc.get_world_size()
@@ -49,6 +50,7 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
         global_rank = 0
 
     print("Test transform: ", test_transform)
+    print("Post transform: ", post_transform)
 
     # Init model with registry
     model = build_from_registry(MODELS, model_args)
@@ -59,8 +61,8 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
         Available evaluators are in: https://github.com/scu-zjz/IMDLBenCo/blob/main/IMDLBenCo/evaluation/__init__.py
         """
     evaluator_list = [
-        PixelF1(threshold=0.5, mode="origin"),
-        # ImageF1(threshold=0.5)
+        # PixelF1(threshold=0.5, mode="origin"),
+        ImageF1(threshold=0.5)
     ]
 
     if args.distributed:
@@ -91,7 +93,8 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
     for test_args in test_dataset_args:
         test_args["init_config"].update({
             "post_funcs": post_function,
-            "common_transforms": test_transform
+            "common_transform": test_transform,
+            "post_transform": post_transform
         })
         test_dataset_list[test_args["dataset_name"]] = build_from_registry(DATASETS, test_args)
     print(f"Test dataset: {[args['dataset_name'] for args in test_dataset_args]}.")

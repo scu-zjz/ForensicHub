@@ -4,16 +4,18 @@ import os
 import torch
 from torch.utils.data import Dataset
 
+
 class BaseDataset(Dataset, ABC):
     """Base class for all forensic datasets in ForensicHub.
     
     This class defines the interface that all dataset classes must implement.
     It inherits from torch.utils.data.Dataset and adds forensic-specific functionality.
     """
-    
-    def __init__(self, 
+
+    def __init__(self,
                  path: str,
-                 common_transforms: Optional[Any] = None,
+                 common_transform: Optional[Any] = None,
+                 post_transform: Optional[Any] = None,
                  img_loader: Any = None,
                  post_funcs: Optional[List[callable]] = None,
                  **kwargs):
@@ -28,13 +30,14 @@ class BaseDataset(Dataset, ABC):
         """
         super().__init__()
         self.path = path
-        self.common_transforms = common_transforms
+        self.common_transform = common_transform
+        self.post_transform = post_transform
         self.img_loader = img_loader
         self.post_funcs = post_funcs
-        
+
         # Initialize dataset paths
         self._init_dataset_path()
-        
+
     @abstractmethod
     def _init_dataset_path(self) -> None:
         """Initialize dataset paths.
@@ -43,11 +46,11 @@ class BaseDataset(Dataset, ABC):
         the paths for images and labels/masks.
         """
         pass
-    
+
     def __len__(self) -> int:
         """Return the number of samples in the dataset."""
         pass
-    
+
     @abstractmethod
     def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
         """Get a sample from the dataset.
@@ -67,7 +70,7 @@ class BaseDataset(Dataset, ABC):
             - ......
         """
         pass
-    
+
     def __str__(self) -> str:
         """Return string representation of the dataset."""
         cls_name = self.__class__.__name__
