@@ -89,6 +89,9 @@ def excute_script(yaml_path, script_path):
     # NOTE: DO NOT USE shell=True to avoid security risk
     # STD out to log file
     # STD err to error file
+    # 用绿色告诉用户，script_path对应的basedir脚本已经开始执行，并告诉用户所有输出日志保存到的路径：
+    print(Fore.GREEN + f"  The script {os.path.basename(script_path)} is running...\n    All logs are saved in: {log_file}\n    All error report are saved in: {error_file}" + Style.RESET_ALL)
+    print()
     with open(log_file, 'a') as log_f, open(error_file, 'a') as error_f:
         process = subprocess.run(
             cmd,
