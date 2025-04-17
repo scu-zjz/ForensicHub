@@ -1,8 +1,8 @@
 import os
 import re
 from colorama import init, Fore, Style
-from IMDLBenCo.utils.paths import BencoPath
-from .copy import copy_files, copy_file 
+from ForensicHub.cli_funcs.paths import ForHubPath
+from .copy import copy_files, copy_file, copy_file_with_recursion
 
 def _copy_train_scripts():
     current_dir = os.getcwd()
@@ -10,16 +10,24 @@ def _copy_train_scripts():
     target_dir = os.path.join(current_dir)
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
-    copy_files(BencoPath.get_templates_dir(), target_dir)
+    copy_files(ForHubPath.get_templates_dir(), target_dir)
     
-    
+def _copy_train_test_yaml():
+    current_dir = os.getcwd()
+    # Copy train scripts
+    target_dir = os.path.join(current_dir)
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+    copy_file_with_recursion(ForHubPath.get_train_test_yaml_dir(), target_dir)
+
+
 def _copy_dataset_json():
     current_dir = os.getcwd()
     # Copy train scripts
     target_dir = os.path.join(current_dir)
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
-    copy_files(BencoPath.get_dataset_json_dir(), target_dir)
+    copy_files(ForHubPath.get_dataset_json_dir(), target_dir)
     
 def _copy_init_base_files():
     current_dir = os.getcwd()
@@ -27,7 +35,7 @@ def _copy_init_base_files():
     target_dir = os.path.join(current_dir)
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
-    copy_files(BencoPath.get_init_base_dir(), target_dir)
+    copy_files(ForHubPath.get_init_base_dir(), target_dir)
     
 def _copy_demo_runs():
     # Copy demo runs
@@ -35,7 +43,7 @@ def _copy_demo_runs():
     target_dir = os.path.join(current_dir, 'runs')
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
-    copy_files(BencoPath.get_model_zoo_runs_dir(), target_dir)
+    copy_files(ForHubPath.get_model_zoo_runs_dir(), target_dir)
     
 def _copy_demo_configs():
     # Copy demo configs
@@ -43,7 +51,7 @@ def _copy_demo_configs():
     target_dir = os.path.join(current_dir, 'configs')
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
-    copy_files(BencoPath.get_model_zoo_configs_dir(), target_dir)
+    copy_files(ForHubPath.get_model_zoo_configs_dir(), target_dir)
     
 # hejack train.py test.py test_robust.py with self defined model
 def _inject_after_last_import(path, inject):
@@ -82,23 +90,24 @@ def cli_init(subcommand):
     # base initialize that only contain default scripts
     if subcommand == "base":
         _copy_train_scripts()
-        _copy_init_base_files()
-        _copy_dataset_json()
-        for name in ['train.py', 'test.py', 'test_robust.py']:
-            injected_str = "from mymodel import MyModel  # TODO, you need to change this line when modifying the name model"
-            current_dir = os.getcwd()
-            target_dir = os.path.join(current_dir, name)
-            _inject_after_last_import(target_dir, injected_str)
+        _copy_train_test_yaml()
+        # _copy_init_base_files()
+        # _copy_dataset_json()
+        # for name in ['train.py', 'test.py', 'test_robust.py']:
+        #     injected_str = "from mymodel import MyModel  # TODO, you need to change this line when modifying the name model"
+        #     current_dir = os.getcwd()
+        #     target_dir = os.path.join(current_dir, name)
+        #     _inject_after_last_import(target_dir, injected_str)
         
-    if subcommand == "model_zoo":
-        _copy_train_scripts()
-        _copy_demo_runs() 
-        _copy_demo_configs()
-        _copy_dataset_json()
-    # base initialize that only contain default scripts
-    if subcommand == "backbone":
-        _copy_train_scripts()
-        _copy_demo_runs() 
-        _copy_demo_configs()
-        _copy_dataset_json()
-    print(f'{Fore.GREEN}Successfully initialized IMDLBenCo scripts.{Style.RESET_ALL}')
+    # if subcommand == "model_zoo":
+    #     _copy_train_scripts()
+    #     _copy_demo_runs() 
+    #     _copy_demo_configs()
+    #     _copy_dataset_json()
+    # # base initialize that only contain default scripts
+    # if subcommand == "backbone":
+    #     _copy_train_scripts()
+    #     _copy_demo_runs() 
+    #     _copy_demo_configs()
+    #     _copy_dataset_json()
+    print(f'{Fore.GREEN}Successfully initialized ForensicHub scripts.{Style.RESET_ALL}')

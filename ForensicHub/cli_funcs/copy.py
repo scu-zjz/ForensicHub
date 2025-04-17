@@ -50,3 +50,33 @@ def copy_files(source: Path, destination):
                         continue
             shutil.copy(template_file, destination_file)
             print(f'  Copied {template_file.name} to {destination}.\n')
+
+def copy_file_with_recursion(source: Path, destination: Path):
+    """
+    Copy files under a path with recursion, with checking and asking about the existence. 
+    """
+    yes_to_all, none_to_all=False, False
+    
+    for template_file in source.rglob('*'):
+        if template_file.is_file():
+            destination_file = Path(destination) / template_file.relative_to(source)
+            if destination_file.exists():
+                if none_to_all:
+                    print(f'  Skipping {template_file.name}.\n')
+                    continue
+                if not yes_to_all:
+                    # Alert , whether overwrite?
+                    print(f'  {Fore.YELLOW}Warning: {template_file.name} already exists in {destination}.{Style.RESET_ALL}')
+                    user_input = input(f'  Do you want to overwrite {template_file.name}? (y/n/all/none): ').strip().lower()
+                    if user_input == 'all':
+                        yes_to_all = True
+                    elif user_input == 'none':
+                        none_to_all = True
+                        print(f'  Skipping {template_file.name}.\n')
+                        continue
+                    elif user_input != 'y':
+                        print(f'  Skipping {template_file.name}.\n')
+                        continue
+            destination_file.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(template_file, destination_file)
+            print(f'  Copied {template_file.name} to {destination}.\n')

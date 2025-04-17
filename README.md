@@ -25,6 +25,16 @@ forhub train /mnt/data0/xiaochen/workspace/fornhub/ForensicHub/ForensicHub/stati
 forhub test /mnt/data0/xiaochen/workspace/fornhub/ForensicHub/ForensicHub/statics/aigc/test_resnet.yaml
 ```
 
+## IMDLBenCo式的代码生成和Training
+找一个干净的工作路径，然后执行如下指令：
+```
+forhub init
+```
+
+这样就会在这个路径下生成所需的yaml和shell脚本，其中`run.sh`作为全局入口，这个模式鼓励任意修改代码。
+
+后续可能会添加`forhub init imdl` `forhub init aigc`这样的分支入口应对不同的情况。
+
 ## Command Line
 查看版本
 ```

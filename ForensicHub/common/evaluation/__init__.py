@@ -7,9 +7,7 @@ from IMDLBenCo.evaluation.abstract_class import AbstractEvaluator
 
 # 动态注册所有 AbstractEvaluator 的非抽象子类
 for name in dir():
-    print(name)
     obj = globals()[name]
-    print(obj)
     if isinstance(obj, type) and issubclass(obj, AbstractEvaluator):
         # 确保类来自 IMDLBenCo.evaluation 模块
         if obj.__module__.startswith('IMDLBenCo.evaluation'):
