@@ -156,6 +156,7 @@ MODELS = Registry(name='MODELS')
 POSTFUNCS = Registry(name='POSTFUNCS')
 DATASETS = Registry(name='DATASETS')
 TRANSFORMS = Registry(name='TRANSFORMS')
+EVALUATORS = Registry(name='EVALUATORS')
 
 # 注册基础抽象类
 MODELS.register_module(module=BaseModel, name='BaseModel')

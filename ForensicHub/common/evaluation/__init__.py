@@ -1,25 +1,22 @@
-# from .temp import cal_confusion_matrix, genertate_region_mask, cal_F1
-# from .abstract_class import AbstractEvaluator
-# from .F1 import ImageF1, PixelF1
-# from .AUC import ImageAUC, PixelAUC
-# from .IOU import PixelIOU
-# from .Accuracy import ImageAccuracy, PixelAccuracy
-# from .gradcam.grad_camera_visualize import grad_camera_visualize
+import IMDLBenCo.evaluation
 from IMDLBenCo.evaluation import *
+from ForensicHub import EVALUATORS
 
-__all__ = [
-    # Below for develop
-    'cal_confusion_matrix', 
-    'generate_region_mask', 
-    'cal_F1',
-    # Below for real-world senario
-    'AbstractEvaluator',
-    'ImageF1',
-    'PixelF1',
-    'ImageAUC',
-    'PixelAUC',
-    'PixelIOU',
-    'ImageAccuracy', 
-    'PixelAccuracy', 
-    'grad_camera_visualize'
-    ]
+# 确保 AbstractEvaluator 被导入，用于后续检查
+from IMDLBenCo.evaluation.abstract_class import AbstractEvaluator
+
+# 动态注册所有 AbstractEvaluator 的非抽象子类
+for name in dir():
+    print(name)
+    obj = globals()[name]
+    print(obj)
+    if isinstance(obj, type) and issubclass(obj, AbstractEvaluator):
+        # 确保类来自 IMDLBenCo.evaluation 模块
+        if obj.__module__.startswith('IMDLBenCo.evaluation'):
+            EVALUATORS.register_module(name, force=True, module=obj)
+
+__all__ = IMDLBenCo.evaluation.__all__
+
+if __name__ == "__main__":
+    print(__all__)
+    print(EVALUATORS)
