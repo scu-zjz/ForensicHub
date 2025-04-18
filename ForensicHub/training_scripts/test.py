@@ -147,7 +147,7 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
         if chkpt_dir.endswith(".pth"):
             print("Loading checkpoint: %s" % chkpt_dir)
             ckpt = os.path.join(args.checkpoint_path, chkpt_dir)
-            ckpt = torch.load(ckpt, map_location='cuda')
+            ckpt = torch.load(ckpt, map_location='cuda', weights_only=False)
             model.module.load_state_dict(ckpt['model'])
 
             for dataset_name, dataloader_test in dataset_dict.items():
