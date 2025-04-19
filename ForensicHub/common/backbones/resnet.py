@@ -165,7 +165,7 @@ class ResNet(BaseModel):
         x = x.view(x.size(0), -1)
         x = self.fc(x)
 
-        x = x.squeeze()
+        x = x.squeeze(dim=1) if x.ndim == 2 and x.shape[1] == 1 else x
         combined_loss = torch.nn.functional.binary_cross_entropy_with_logits(x, label)
         data_dict = {
             "backward_loss": combined_loss,

@@ -9,10 +9,10 @@ import timm.optim.optim_factory as optim_factory
 from torch.utils.tensorboard import SummaryWriter
 
 import ForensicHub.training_scripts.utils.misc as misc
-from ForensicHub.registry import DATASETS, MODELS, POSTFUNCS, TRANSFORMS, build_from_registry
+from ForensicHub.registry import DATASETS, MODELS, POSTFUNCS, TRANSFORMS, EVALUATORS, build_from_registry
 from ForensicHub.common.evaluation import PixelF1, ImageF1
-from ForensicHub.training_scripts.tester import test_one_epoch
-from ForensicHub.training_scripts.trainer import train_one_epoch
+from IMDLBenCo.training_scripts.tester import test_one_epoch
+from IMDLBenCo.training_scripts.trainer import train_one_epoch
 from ForensicHub.common.utils.yaml import load_yaml_config, split_config, add_attr
 
 
@@ -24,12 +24,12 @@ def get_args_parser():
     config = load_yaml_config(args.config)
 
     # model_args, train_dataset_args, transform_args are dict type, test_dataset_args is dict list.
-    args, model_args, train_dataset_args, test_dataset_args, transform_args = split_config(config)
+    args, model_args, train_dataset_args, test_dataset_args, transform_args, evaluator_args = split_config(config)
     add_attr(args, output_dir=args.log_dir)
-    return args, model_args, train_dataset_args, test_dataset_args, transform_args
+    return args, model_args, train_dataset_args, test_dataset_args, transform_args, evaluator_args
 
 
-def main(args, model_args, train_dataset_args, test_dataset_args, transform_args):
+def main(args, model_args, train_dataset_args, test_dataset_args, transform_args, evaluator_args):
     # init parameters for distributed training
     misc.init_distributed_mode(args)
     import torch.multiprocessing
@@ -136,15 +136,11 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
     # Init model with registry
     model = build_from_registry(MODELS, model_args)
 
-    """
-    TODO Set the evaluator you want to use
-    You can use PixelF1, ImageF1, or any other evaluator you like.
-    Available evaluators are in: https://github.com/scu-zjz/IMDLBenCo/blob/main/IMDLBenCo/evaluation/__init__.py
-    """
-    evaluator_list = [
-        # PixelF1(threshold=0.5, mode="origin"),
-        ImageF1(threshold=0.5)
-    ]
+    # Init evaluators
+    evaluator_list = []
+    for eva_args in evaluator_args:
+        evaluator_list.append(build_from_registry(EVALUATORS, eva_args))
+    print(f"Evaluators: {evaluator_list}")
 
     if args.distributed:
         model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
@@ -238,8 +234,8 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
                 best_evaluate_metric_value = evaluate_metric_value
                 print(
                     f"Best {' '.join([evaluator.name for evaluator in evaluator_list])} = {best_evaluate_metric_value}")
-                # Save the best only after 20 epoch. TODO you can modify this.
-                if epoch > 20:
+                # Save the best only after record epoch.
+                if epoch >= args.record_epoch:
                     misc.save_model(
                         args=args, model=model, model_without_ddp=model_without_ddp, optimizer=optimizer,
                         loss_scaler=loss_scaler, epoch=epoch)
@@ -268,7 +264,7 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
 
 
 if __name__ == '__main__':
-    args, model_args, train_dataset_args, test_dataset_args, transform_args = get_args_parser()
+    args, model_args, train_dataset_args, test_dataset_args, transform_args, evaluator_args = get_args_parser()
     if args.output_dir:
         Path(args.output_dir).mkdir(parents=True, exist_ok=True)
-    main(args, model_args, train_dataset_args, test_dataset_args, transform_args)
+    main(args, model_args, train_dataset_args, test_dataset_args, transform_args, evaluator_args)

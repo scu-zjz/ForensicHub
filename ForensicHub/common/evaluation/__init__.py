@@ -14,7 +14,3 @@ for name in dir():
             EVALUATORS.register_module(name, force=True, module=obj)
 
 __all__ = IMDLBenCo.evaluation.__all__
-
-if __name__ == "__main__":
-    print(__all__)
-    print(EVALUATORS)

@@ -46,6 +46,7 @@ def split_config(config):
     train_dataset_args = config.pop("train_dataset", {})
     test_dataset_args = config.pop("test_dataset", [])
     transform_args = config.pop("transform", {})
+    evaluator_args = config.pop("evaluator", [])
     args = config  # 剩下的就是全局 args
 
     if "init_config" not in model_args:
@@ -57,13 +58,17 @@ def split_config(config):
         train_dataset_args["init_config"] = {}
     if "init_config" not in transform_args:
         transform_args["init_config"] = {}
+    for x in evaluator_args:
+        if "init_config" not in x:
+            x["init_config"] = {}
 
     return (
         dict_to_namespace(args),
         model_args,
         train_dataset_args,
         test_dataset_args,
-        transform_args
+        transform_args,
+        evaluator_args
     )
 
     # return (
