@@ -53,7 +53,7 @@ def _copy_demo_configs():
         os.makedirs(target_dir)
     copy_files(ForHubPath.get_model_zoo_configs_dir(), target_dir)
     
-# hejack train.py test.py test_robust.py with self defined model
+# hejack train.py test_mytest.py test_robust.py with self defined model
 def _inject_after_last_import(path, inject):
     # 读取文件内容
     with open(path, 'r') as file:
@@ -93,7 +93,7 @@ def cli_init(subcommand):
         _copy_train_test_yaml()
         # _copy_init_base_files()
         # _copy_dataset_json()
-        # for name in ['train.py', 'test.py', 'test_robust.py']:
+        # for name in ['train.py', 'test_mytest.py', 'test_robust.py']:
         #     injected_str = "from mymodel import MyModel  # TODO, you need to change this line when modifying the name model"
         #     current_dir = os.getcwd()
         #     target_dir = os.path.join(current_dir, name)
