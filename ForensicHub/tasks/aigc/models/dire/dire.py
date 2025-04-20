@@ -17,6 +17,9 @@ from ForensicHub.core.base_model import BaseModel
 from ForensicHub.registry import register_model
 from ForensicHub.common.backbones.resnet import Resnet50
 
+'''
+Dire for diffusion-generated image detection
+'''
 
 @register_model("Dire")
 class Dire(BaseModel):
