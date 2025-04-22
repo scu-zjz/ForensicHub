@@ -11,34 +11,54 @@ from torch.utils.tensorboard import SummaryWriter
 import ForensicHub.training_scripts.utils.misc as misc
 from ForensicHub.registry import DATASETS, MODELS, POSTFUNCS, TRANSFORMS, build_from_registry
 from ForensicHub.common.evaluation import PixelF1, ImageF1
-from ForensicHub.training_scripts.tester import test_one_epoch
-from ForensicHub.training_scripts.trainer import train_one_epoch
+from IMDLBenCo.training_scripts.tester import test_one_epoch
+from IMDLBenCo.training_scripts.trainer import train_one_epoch
 from ForensicHub.common.utils.yaml import load_yaml_config, split_config, add_attr
 # from ForensicHub.tasks.deepfake.datasets.get_loaders import prepare_testing_data, prepare_training_data
 from ForensicHub.tasks.deepfake.datasets.get_loaders import prepare_testing_data, prepare_training_data
 from ForensicHub.tasks.deepfake.wrapper.wrappers import DeepfakeOutputWrapper, BencoOutputWrapper
+from IMDLBenCo import MODELS
+from argparse import Namespace
+
+def dict_to_namespace(d):
+    """递归地将 dict 转换成 argparse.Namespace"""
+    if isinstance(d, dict):
+        return Namespace(**{k: dict_to_namespace(v) for k, v in d.items()})
+    elif isinstance(d, list):
+        return [dict_to_namespace(x) for x in d]
+    else:
+        return d
+    
 def get_args_parser():
     parser = argparse.ArgumentParser('ForensicHub benchmark training launch!', add_help=True)
     parser.add_argument("--config", type=str, help="Path to YAML config file", required=True)
 
     args = parser.parse_args()
     config = load_yaml_config(args.config)
-
     # model_args, train_dataset_args, transform_args are dict type, test_dataset_args is dict list.
-    args, model_args, train_dataset_args, test_dataset_args, transform_args = split_config(config)
-    import pdb;pdb.set_trace()
-    add_attr(args, output_dir=args.log_dir)
+    
+    # args, model_args, train_dataset_args, test_dataset_args, transform_args,evaluator_args = split_config(config)
+    
     if 'deepfake_config' in config.keys():
-        deepfake_config = load_yaml_config(args.deepfake_config)
+        deepfake_config = load_yaml_config(config['deepfake_config'])
         deepfake_config['rgb_dir'] = '/mnt/data1/xuekang/workspace/Wrapper/datasets/rgb'
         deepfake_config['dataset_json_folder'] = '/mnt/data1/xuekang/workspace/DeepfakeBench/DeepfakeBench/preprocessing/dataset_json'
         deepfake_config['label_dict'] = config['label_dict']
         deepfake_config['ddp'] = config['ddp']
-        return args, model_args, train_dataset_args, test_dataset_args, transform_args,deepfake_config
-    return args, model_args, train_dataset_args, test_dataset_args, transform_args, None
+        args = dict_to_namespace(config)
+        add_attr(args, output_dir=args.log_dir)
+        return args, None, deepfake_config
+    else:
+        iml_model_yaml = config['iml_config']
+        iml_config = load_yaml_config(iml_model_yaml)
+        _, model_args, _, _, _,_ = split_config(iml_config)
+        args = dict_to_namespace(config)
+        add_attr(args, output_dir=args.log_dir)
+        config['model_name'] = model_args['name']
+        return args, model_args, config
 
 
-def main(args, model_args, train_dataset_args, test_dataset_args, transform_args, deepfake_config):
+def main(args, model_args, deepfake_config):
     # init parameters for distributed training
     misc.init_distributed_mode(args)
     import torch.multiprocessing
@@ -54,68 +74,11 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
     torch.manual_seed(seed)
     np.random.seed(seed)
 
-    # transform = build_from_registry(TRANSFORMS, transform_args)
-    # train_transform = transform.get_train_transform()
-    # test_transform = transform.get_test_transform()
-    # post_transform = transform.get_post_transform()
-
-    # print("Train transform: ", train_transform)
-    # print("Test transform: ", test_transform)
-    # print("Post transform: ", post_transform)
-
-    # # get post function (if have)
-    # post_function_name = f"{model_args['name']}_post_func".lower()
-    # print(f"Post function check: {post_function_name}")
-    # print(POSTFUNCS)
-    # if POSTFUNCS.has(post_function_name):
-    #     post_function = POSTFUNCS.get(post_function_name)
-    # else:
-    #     post_function = None
-
-    # train_dataset_args["init_config"].update({
-    #     "post_funcs": post_function,
-    #     "common_transform": train_transform,
-    #     "post_transform": post_transform
-    # })
-    # train_dataset = build_from_registry(DATASETS, train_dataset_args)
-
-    # test_dataset_list = {}
-    # for test_args in test_dataset_args:
-    #     test_args["init_config"].update({
-    #         "post_funcs": post_function,
-    #         "common_transform": test_transform,
-    #         "post_transform": post_transform
-    #     })
-    #     test_dataset_list[test_args["dataset_name"]] = build_from_registry(DATASETS, test_args)
-
-    # print(f"Train dataset: {train_dataset_args['dataset_name']}.")
-    # print(len(train_dataset))
-    # print(f"Test dataset: {[args['dataset_name'] for args in test_dataset_args]}.")
-    # print([len(dataset) for dataset in test_dataset_list.values()])
 
     # test_sampler = {}
     if args.distributed:
         num_tasks = misc.get_world_size()
         global_rank = misc.get_rank()
-    #     sampler_train = torch.utils.data.DistributedSampler(
-    #         train_dataset, num_replicas=num_tasks, rank=global_rank, shuffle=True
-    #     )
-    #     for test_dataset_name, dataset_test in test_dataset_list.items():
-    #         sampler_test = torch.utils.data.DistributedSampler(
-    #             dataset_test,
-    #             num_replicas=num_tasks,
-    #             rank=global_rank,
-    #             shuffle=False,
-    #             drop_last=True
-    #         )
-    #         test_sampler[test_dataset_name] = sampler_test
-    #     print("Sampler_train = %s" % str(sampler_train))
-    #     print("Sampler_test = %s" % str(sampler_test))
-    # else:
-    #     sampler_train = torch.utils.data.RandomSampler(train_dataset)
-    #     for test_dataset_name, dataset_test in test_dataset_list.items():
-    #         sampler_test = torch.utils.data.RandomSampler(dataset_test)
-    #         test_sampler[test_dataset_name] = sampler_test
 
     if global_rank == 0 and args.log_dir is not None:
         os.makedirs(args.log_dir, exist_ok=True)
@@ -123,35 +86,19 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
     else:
         log_writer = None
 
-    # data_loader_train = torch.utils.data.DataLoader(
-    #     train_dataset, sampler=sampler_train,
-    #     batch_size=args.batch_size,
-    #     num_workers=args.num_workers,
-    #     pin_memory=args.pin_mem,
-    #     drop_last=True,
-    # )
-
-    # test_dataloaders = {}
-    # for test_dataset_name in test_sampler.keys():
-    #     test_dataloader = torch.utils.data.DataLoader(
-    #         test_dataset_list[test_dataset_name], sampler=test_sampler[test_dataset_name],
-    #         batch_size=args.test_batch_size,
-    #         num_workers=args.num_workers,
-    #         pin_memory=args.pin_mem,
-    #         drop_last=True,
-    #     )
-    #     test_dataloaders[test_dataset_name] = test_dataloader
-    if deepfake_config:
-        data_loader_train = prepare_training_data(deepfake_config)
-        # prepare the testing data loader
-        test_dataloaders = prepare_testing_data(deepfake_config)
-        if MODELS.get(deepfake_config['model_name']).__module__.startswith("DeepfakeBench"):
-            model_class = MODELS.get(deepfake_config['model_name'])
-            model = model_class(deepfake_config)
-            model = DeepfakeOutputWrapper(model)
+    data_loader_train = prepare_training_data(deepfake_config)
+    # prepare the testing data loader
+    test_dataloaders = prepare_testing_data(deepfake_config)
+    if not model_args:
+        model_class = MODELS.get(deepfake_config['model_name'])
+        model = model_class(deepfake_config)
+        model = DeepfakeOutputWrapper(model)
     else:
         # Init model with registry
-        model = build_from_registry(MODELS, model_args)
+        model = MODELS.build(model_args['name'])
+        model = BencoOutputWrapper(model)
+        # model = build_from_registry(MODELS, model_args)
+        
     
     """
     TODO Set the evaluator you want to use
@@ -204,13 +151,13 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
         if args.distributed:
             data_loader_train.sampler.set_epoch(epoch)
         # train for one epoch
-        train_stats = train_one_epoch(
-            model, data_loader_train,
-            optimizer, device, epoch, loss_scaler,
-            log_writer=log_writer,
-            log_per_epoch_count=args.log_per_epoch_count,
-            args=args
-        )
+        # train_stats = train_one_epoch(
+        #     model, data_loader_train,
+        #     optimizer, device, epoch, loss_scaler,
+        #     log_writer=log_writer,
+        #     log_per_epoch_count=args.log_per_epoch_count,
+        #     args=args
+        # )
 
         # # saving checkpoint
         if args.output_dir and (epoch % 25 == 0 or epoch + 1 == args.epochs):
@@ -285,7 +232,7 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
 
 
 if __name__ == '__main__':
-    args, model_args, train_dataset_args, test_dataset_args, transform_args,deepfake_config = get_args_parser()
+    args, model_args, deepfake_config = get_args_parser()
     if args.output_dir:
         Path(args.output_dir).mkdir(parents=True, exist_ok=True)
-    main(args, model_args, train_dataset_args, test_dataset_args, transform_args,deepfake_config)
+    main(args, model_args,deepfake_config)

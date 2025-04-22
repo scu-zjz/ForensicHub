@@ -55,21 +55,19 @@ class BencoOutputWrapper(nn.Module):
         self.base_model = base_model
         self.head = nn.AdaptiveAvgPool2d(1)
         self.loss_fn = nn.BCEWithLogitsLoss()
-        
-    def forward(self, image, label,mask,landmark, *args, **kwargs):        
+    def forward(self, image, label, mask,landmark, *args, **kwargs):        
         mask = torch.randint(0,1,(image.shape[0],1,image.shape[2],image.shape[3])).long().to(image.device)
         edge_mask = torch.randint(0,1,(image.shape[0],1,image.shape[2],image.shape[3])).long().to(image.device)
-        outputs = self.base_model(image=image, mask=mask, edge_mask=edge_mask,label=label, *args, **kwargs)
-        pred_mask = outputs['pred_mask']
-        pred_label = self.head(pred_mask).view(-1)
+        # outputs = self.base_model(image=image, mask=mask, edge_mask=edge_mask,label=label, *args, **kwargs)
+        features = self.base_model.forward_feature(image=image, mask=mask, edge_mask=edge_mask,label=label, *args, **kwargs)
+        pred_label = self.head(features).view(-1)
         loss = self.loss_fn(pred_label, label.float())
         pred_label = F.sigmoid(pred_label)
         # ----------Output interface--------------------------------------
         output_dict = {
             # loss for backward
             "backward_loss": loss,
-            # predicted mask, will calculate for metrics automatically
-            "pred_mask": torch.randn(image.shape).to(image.device),
+
             # predicted binaray label, will calculate for metrics automatically
             "pred_label": pred_label,
 

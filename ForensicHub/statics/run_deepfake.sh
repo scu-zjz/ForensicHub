@@ -1,6 +1,6 @@
 #!/bin/bash
 
-yaml_config="/mnt/data1/xuekang/workspace/ForensicHub/ForensicHub/statics/deepfake/train_deepfake.yaml"
+yaml_config="/mnt/data1/xuekang/workspace/ForensicHub/ForensicHub/statics/deepfake/train_deepfake_IML_model.yaml"
 
 # 从 yaml 中读取 gpus、log_dir 和 flag
 gpus=$(python -c "import yaml; print(yaml.safe_load(open('$yaml_config'))['gpus'])")
@@ -32,4 +32,4 @@ torchrun  \
     --nproc_per_node=${gpu_count} \
 ${script_path} \
    --config $yaml_config \
-# 2> ${base_dir}/error.log 1>${base_dir}/logs.log
+2> ${base_dir}/error.log 1>${base_dir}/logs.log
