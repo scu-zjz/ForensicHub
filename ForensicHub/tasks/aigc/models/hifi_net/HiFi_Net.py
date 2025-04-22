@@ -8,6 +8,10 @@ import torch.nn.functional as F
 from ForensicHub.registry import register_model
 from ForensicHub.core.base_model import BaseModel
 
+'''
+Hierarchical fine-grained image forgery detection and localization
+'''
+
 
 @register_model("HiFi_Net")
 class HiFi_Net(BaseModel):
