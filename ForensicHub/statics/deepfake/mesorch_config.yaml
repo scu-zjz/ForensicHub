@@ -1,0 +1,5 @@
+model: 
+  name: 'Mesorch'
+  init_config:
+    conv_pretrain: true
+    seg_pretrain_path: '/mnt/data0/xuekang/workspace/convswin/mit_b3.pth'

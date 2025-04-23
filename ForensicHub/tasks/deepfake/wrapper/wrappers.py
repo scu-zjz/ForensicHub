@@ -43,7 +43,7 @@ class DeepfakeOutputWrapper(nn.Module):
         return output_dict
     
 class BencoOutputWrapper(nn.Module):
-    def __init__(self, base_model) -> None:
+    def __init__(self, base_model, model_args) -> None:
         """
         The parameters of the `__init__` function will be automatically converted into the parameters expected by the argparser in the training and testing scripts by the framework according to their annotated types and variable names. 
         
@@ -53,16 +53,22 @@ class BencoOutputWrapper(nn.Module):
         
         # Useless, just an example
         self.base_model = base_model
+        self.model_args = model_args
         self.head = nn.AdaptiveAvgPool2d(1)
         self.loss_fn = nn.BCEWithLogitsLoss()
-    def forward(self, image, label, mask,landmark, *args, **kwargs):        
-        mask = torch.randint(0,1,(image.shape[0],1,image.shape[2],image.shape[3])).long().to(image.device)
-        edge_mask = torch.randint(0,1,(image.shape[0],1,image.shape[2],image.shape[3])).long().to(image.device)
-        # outputs = self.base_model(image=image, mask=mask, edge_mask=edge_mask,label=label, *args, **kwargs)
-        features = self.base_model.forward_feature(image=image, mask=mask, edge_mask=edge_mask,label=label, *args, **kwargs)
-        pred_label = self.head(features).view(-1)
-        loss = self.loss_fn(pred_label, label.float())
-        pred_label = F.sigmoid(pred_label)
+
+    def forward(self, image, label, mask, landmark, *args, **kwargs):     
+        if self.model_args['name'] in ['IML_ViT', 'Mesorch']:
+            features = self.base_model.forward_features(image)
+            pred_label = self.head(features).view(-1)
+            loss = self.loss_fn(pred_label, label.float())
+            pred_label = F.sigmoid(pred_label)
+        else:
+            mask = torch.randint(0,1,(image.shape[0],1,image.shape[2],image.shape[3])).long().to(image.device)
+            edge_mask = torch.randint(0,1,(image.shape[0],1,image.shape[2],image.shape[3])).long().to(image.device)
+            outputs = self.base_model(image=image, mask=mask, edge_mask=edge_mask,label=label, *args, **kwargs)
+            pred_label = outputs['pred_label']
+            loss = F.binary_cross_entropy(pred_label, label.float())
         # ----------Output interface--------------------------------------
         output_dict = {
             # loss for backward

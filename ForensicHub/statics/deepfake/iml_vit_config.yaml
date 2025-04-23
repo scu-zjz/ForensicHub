@@ -1,0 +1,5 @@
+model: 
+  name: 'IML_ViT'
+  init_config:
+    edge_lambda: 20
+    vit_pretrain_path: '/mnt/data1/xuekang/workspace/IMDLBenCotest/mae_pretrain_vit_base.pth'

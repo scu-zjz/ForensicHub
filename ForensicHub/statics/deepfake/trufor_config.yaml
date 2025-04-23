@@ -1,0 +1,6 @@
+model: 
+  name: 'Trufor'
+  init_config:
+    np_pretrain_weights: '/mnt/data1/xuekang/workspace/IMDLBenCotest/noiseprint.pth'
+    mit_b2_pretrain_weights: '/mnt/data1/xuekang/workspace/IMDLBenCotest/mit_b2.pth'
+    config_path: '/mnt/data1/xuekang/workspace/IMDLBenCotest/trufor.yaml'

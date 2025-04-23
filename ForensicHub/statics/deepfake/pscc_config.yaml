@@ -1,0 +1,4 @@
+model: 
+  name: 'PSCC_Net'
+  init_config:
+    pretrain_path: '/mnt/data0/dubo/workspace/IMDLBenCo/IMDLBenCo/model_zoo/pscc/hrnet_w18_small_v2.pth'

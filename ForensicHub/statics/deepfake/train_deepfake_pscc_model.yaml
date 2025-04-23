@@ -3,13 +3,13 @@ gpus: "0,1,2,3"
 flag: train
 
 # Log
-log_dir: "./log/deepfake_iml_df_train"
+log_dir: "./log/deepfake_pscc_train"
 
 # Task
 if_predict_label: true
 if_predict_mask: false
 
-iml_config: '/mnt/data1/xuekang/workspace/ForensicHub/ForensicHub/statics/deepfake/iml_config.yaml'
+iml_config: '/mnt/data1/xuekang/workspace/ForensicHub/ForensicHub/statics/deepfake/pscc_config.yaml'
 
 rgb_dir : '/mnt/data1/public_datasets/Deepfake'
 
@@ -18,19 +18,20 @@ dataset_json_folder : '/mnt/data1/public_datasets/Deepfake'
 all_dataset: [FaceForensics++, FF-F2F, FF-DF, FF-FS, FF-NT, FaceShifter, DeepFakeDetection, Celeb-DF-v1, Celeb-DF-v2, DFDCP, DFDC, DeeperForensics-1.0, UADFV，'FaceForensics++_c40']
 train_dataset: [FaceForensics++]
 test_dataset: [FaceForensics++_c40, FF-DF, FF-F2F,  FF-FS, FF-NT, Celeb-DF-v1, Celeb-DF-v2, DeepFakeDetection, DFDC, DFDCP, FaceShifter, UADFV]
+# test_dataset: [FF-DF, FF-F2F,  FF-FS, FF-NT, Celeb-DF-v1, Celeb-DF-v2, DeepFakeDetection, DFDC, DFDCP, FaceShifter, UADFV]
 
 
 compression: c23  # compression-level for videos
-train_batchSize: 24   # training batch size
+train_batchSize: 32   # training batch size
 test_batchSize: 32   # test batch size
 workers: 8   # number of data loading workers
 frame_num: {'train': 32, 'test': 32}   # number of frames to use per video in training and testing
-resolution: 512   # resolution of output image to network
+resolution: 256   # resolution of output image to network
 with_mask: false   # whether to include mask information in the input
 with_landmark: false   # whether to include facial landmark information in the input
 
 # Training related
-batch_size: 24
+batch_size: 32
 test_batch_size: 32
 epochs: 10
 accum_iter: 1
@@ -44,14 +45,14 @@ log_per_epoch_count: 1
 
 # DDP & AMP settings
 find_unused_parameters: true
-if_not_amp: true
+if_not_amp: false
 
 # Optimizer parameters
-weight_decay: 0.05
+weight_decay: 0.0005
 lr: 2e-4
 blr: 0.001
 min_lr: 2e-4
-warmup_epochs: 1
+warmup_epochs: 0
 
 # Device and training control
 device: "cuda"
