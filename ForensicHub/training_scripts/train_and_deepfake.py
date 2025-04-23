@@ -95,10 +95,9 @@ def main(args, model_args, deepfake_config):
         model = DeepfakeOutputWrapper(model)
     else:
         # Init model with registry
-        model = MODELS.build(model_args['name'])
-        model = BencoOutputWrapper(model)
-        # model = build_from_registry(MODELS, model_args)
-        
+        # model = MODELS.build(model_args['name'])
+        model = build_from_registry(MODELS, model_args)
+        model = BencoOutputWrapper(model, model_args)
     
     """
     TODO Set the evaluator you want to use
@@ -151,13 +150,13 @@ def main(args, model_args, deepfake_config):
         if args.distributed:
             data_loader_train.sampler.set_epoch(epoch)
         # train for one epoch
-        # train_stats = train_one_epoch(
-        #     model, data_loader_train,
-        #     optimizer, device, epoch, loss_scaler,
-        #     log_writer=log_writer,
-        #     log_per_epoch_count=args.log_per_epoch_count,
-        #     args=args
-        # )
+        train_stats = train_one_epoch(
+            model, data_loader_train,
+            optimizer, device, epoch, loss_scaler,
+            log_writer=log_writer,
+            log_per_epoch_count=args.log_per_epoch_count,
+            args=args
+        )
 
         # # saving checkpoint
         if args.output_dir and (epoch % 25 == 0 or epoch + 1 == args.epochs):
@@ -203,10 +202,9 @@ def main(args, model_args, deepfake_config):
                 print(
                     f"Best {' '.join([evaluator.name for evaluator in evaluator_list])} = {best_evaluate_metric_value}")
                 # Save the best only after 20 epoch. TODO you can modify this.
-                if epoch > 20:
-                    misc.save_model(
-                        args=args, model=model, model_without_ddp=model_without_ddp, optimizer=optimizer,
-                        loss_scaler=loss_scaler, epoch=epoch)
+                misc.save_model(
+                    args=args, model=model, model_without_ddp=model_without_ddp, optimizer=optimizer,
+                    loss_scaler=loss_scaler, epoch=epoch)
             else:
                 print(f"Average {' '.join([evaluator.name for evaluator in evaluator_list])} = {evaluate_metric_value}")
             # Log the metrics to Tensorboard
