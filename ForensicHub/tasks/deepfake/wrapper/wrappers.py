@@ -54,18 +54,24 @@ class BencoOutputWrapper(nn.Module):
         # Useless, just an example
         self.base_model = base_model
         self.model_args = model_args
-        self.head = nn.AdaptiveAvgPool2d(1)
+        self.head = nn.AdaptiveMaxPool2d(1)
         self.loss_fn = nn.BCEWithLogitsLoss()
 
-    def forward(self, image, label, mask, landmark, *args, **kwargs):     
-        if self.model_args['name'] in ['IML_ViT', 'Mesorch']:
-            features = self.base_model.forward_features(image)
-            pred_label = self.head(features).view(-1)
+    def forward(self, image, label, mask, landmark, *args, **kwargs):   
+        mask = torch.randint(0,1,(image.shape[0],1,image.shape[2],image.shape[3])).long().to(image.device)
+        edge_mask = torch.randint(0,1,(image.shape[0],1,image.shape[2],image.shape[3])).long().to(image.device)
+        if self.model_args['name'] in ['IML_ViT', 'Mesorch', 'Cat_Net']:
+            features = self.base_model.forward_features(image=image, mask=mask, edge_mask=edge_mask,label=label, *args, **kwargs)
+            if type(features) == tuple:
+                features = features[0]
+            pred_label = self.head(features)
+            if pred_label.shape[1] != 1:
+                pred_label = pred_label[:, 1].view(-1)
+            else:
+                pred_label = pred_label.view(-1)
             loss = self.loss_fn(pred_label, label.float())
             pred_label = F.sigmoid(pred_label)
         else:
-            mask = torch.randint(0,1,(image.shape[0],1,image.shape[2],image.shape[3])).long().to(image.device)
-            edge_mask = torch.randint(0,1,(image.shape[0],1,image.shape[2],image.shape[3])).long().to(image.device)
             outputs = self.base_model(image=image, mask=mask, edge_mask=edge_mask,label=label, *args, **kwargs)
             pred_label = outputs['pred_label']
             loss = F.binary_cross_entropy(pred_label, label.float())
@@ -91,5 +97,33 @@ class BencoOutputWrapper(nn.Module):
         return output_dict
 
 
-def json_wrapper(config):
-    return config
+def collate_fn_wrapper(collate_fn, post_fn):
+    def wrapped_collate_fn(batch):
+        data_dict = collate_fn(batch)
+
+        # 拿出 batch 图像 [B, 3, H, W]
+        tp_imgs = data_dict['image']
+        B = tp_imgs.shape[0]
+
+        DCT_list = []
+        qtables_list = []
+
+        for i in range(B):
+            single_dict = {'image': tp_imgs[i]}
+            post_fn(single_dict)  # 调用原 post_fn，得到 numpy.ndarray
+
+            # 转换为 tensor
+            DCT_tensor = torch.from_numpy(single_dict['DCT_coef'])
+            qtable_tensor = torch.from_numpy(single_dict['qtables'])
+
+            DCT_list.append(DCT_tensor)
+            qtables_list.append(qtable_tensor)
+
+        data_dict['DCT_coef'] = torch.stack(DCT_list, dim=0)
+        data_dict['qtables'] = torch.stack(qtables_list, dim=0)
+
+        # （可选）再调用一次整体的 post_fn，按需启用
+        # post_fn(data_dict)
+
+        return data_dict
+    return wrapped_collate_fn

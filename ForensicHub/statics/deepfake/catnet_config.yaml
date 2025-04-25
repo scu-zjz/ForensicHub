@@ -1,0 +1,4 @@
+model: 
+  name: 'Cat_Net'
+  init_config:
+    cfg_file: '/mnt/data1/xuekang/workspace/IMDLBenCo/IMDLBenCo/statics/model_zoo/configs/CAT_full.yaml'

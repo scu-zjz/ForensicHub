@@ -33,35 +33,23 @@ def denormalize(image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
 
 
 def convert_to_temp_jpeg(tensor):
-    # 将tensor转换为numpy数组
-    if isinstance(tensor, torch.Tensor):
-        tensor = tensor.cpu().numpy()
-
-    # 确保数据在0-255范围内
-    tensor = np.clip(tensor * 255, 0, 255).astype(np.uint8)
-
-    # 创建临时文件
-    temp_file = tempfile.NamedTemporaryFile(suffix='.jpg', delete=False)
-    temp_path = temp_file.name
-
-    # 保存为JPEG
-    cv2.imwrite(temp_path, tensor)
-
-    return temp_path
+    tensor = tensor.permute(1, 2, 0)
+    img = Image.fromarray(tensor.numpy().astype('uint8'))
+    
+    with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as temp_file:
+        img.save(temp_file, format='JPEG')
+        temp_file_path = temp_file.name
+    
+    return temp_file_path
 
 
-def read_jpeg_from_memory(image_data):
-    # 将图像数据转换为字节流
-    if isinstance(image_data, bytes):
-        image_bytes = image_data
-    else:
-        image_bytes = image_data.tobytes()
-
-    # 使用jpegio读取内存中的JPEG数据
-    jpegio = import_jpegio()
-    jpeg_obj = jpegio.read_from_memory(image_bytes)
-
-    return jpeg_obj
+def read_jpeg_from_memory(tensor):
+    jio = import_jpegio()
+    temp_file_path = convert_to_temp_jpeg(tensor)
+    jpeg = jio.read(temp_file_path)
+    os.remove(temp_file_path)
+    
+    return jpeg
 
 
 class EdgeMaskGenerator(torch.nn.Module):

@@ -10,13 +10,13 @@ from torch.utils.tensorboard import SummaryWriter
 
 import ForensicHub.training_scripts.utils.misc as misc
 from ForensicHub.registry import DATASETS, MODELS, POSTFUNCS, TRANSFORMS, build_from_registry
-from ForensicHub.common.evaluation import PixelF1, ImageF1
+from ForensicHub.common.evaluation import PixelF1, ImageF1,ImageAUC
 from IMDLBenCo.training_scripts.tester import test_one_epoch
 from IMDLBenCo.training_scripts.trainer import train_one_epoch
 from ForensicHub.common.utils.yaml import load_yaml_config, split_config, add_attr
 # from ForensicHub.tasks.deepfake.datasets.get_loaders import prepare_testing_data, prepare_training_data
 from ForensicHub.tasks.deepfake.datasets.get_loaders import prepare_testing_data, prepare_training_data
-from ForensicHub.tasks.deepfake.wrapper.wrappers import DeepfakeOutputWrapper, BencoOutputWrapper
+from ForensicHub.tasks.deepfake.wrapper.wrappers import DeepfakeOutputWrapper, BencoOutputWrapper, collate_fn_wrapper
 from IMDLBenCo import MODELS
 from argparse import Namespace
 
@@ -98,6 +98,21 @@ def main(args, model_args, deepfake_config):
         # model = MODELS.build(model_args['name'])
         model = build_from_registry(MODELS, model_args)
         model = BencoOutputWrapper(model, model_args)
+        post_function_name = f"{model_args['name']}_post_func".lower()
+        print(f"Post function check: {post_function_name}")
+        if POSTFUNCS.has(post_function_name):
+            post_function = POSTFUNCS.get(post_function_name)
+        else:
+            post_function = None
+        if post_function:
+            print(data_loader_train.collate_fn is list(test_dataloaders.values())[0].collate_fn)
+            train_collate_fn = data_loader_train.collate_fn
+            train_collate_fn = collate_fn_wrapper(train_collate_fn, post_function)
+            data_loader_train.collate_fn = train_collate_fn
+            for dataloader in test_dataloaders.values():
+                test_collate_fn = dataloader.collate_fn
+                test_collate_fn = collate_fn_wrapper(test_collate_fn, post_function)
+                dataloader.collate_fn = test_collate_fn
     
     """
     TODO Set the evaluator you want to use
@@ -106,7 +121,7 @@ def main(args, model_args, deepfake_config):
     """
     evaluator_list = [
         # PixelF1(threshold=0.5, mode="origin"),
-        ImageF1(threshold=0.5)
+        ImageAUC(threshold=0.5)
     ]
 
     if args.distributed:

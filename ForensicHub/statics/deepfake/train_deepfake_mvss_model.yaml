@@ -17,7 +17,7 @@ dataset_json_folder : '/mnt/data1/public_datasets/Deepfake'
 
 all_dataset: [FaceForensics++, FF-F2F, FF-DF, FF-FS, FF-NT, FaceShifter, DeepFakeDetection, Celeb-DF-v1, Celeb-DF-v2, DFDCP, DFDC, DeeperForensics-1.0, UADFV，'FaceForensics++_c40']
 train_dataset: [FaceForensics++]
-test_dataset: [FaceForensics++_c40, FF-DF, FF-F2F,  FF-FS, FF-NT, Celeb-DF-v1, Celeb-DF-v2, DeepFakeDetection, DFDC, DFDCP, FaceShifter, UADFV]
+test_dataset: [FaceForensics++, FaceForensics++_c40, FF-DF, FF-F2F,  FF-FS, FF-NT, Celeb-DF-v1, Celeb-DF-v2, DeepFakeDetection, DFDC, DFDCP, FaceShifter, UADFV]
 # test_dataset: [FF-DF, FF-F2F,  FF-FS, FF-NT, Celeb-DF-v1, Celeb-DF-v2, DeepFakeDetection, DFDC, DFDCP, FaceShifter, UADFV]
 
 

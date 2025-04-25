@@ -1,5 +1,5 @@
 # DDP
-gpus: "0,1,2,3"
+gpus: "5"
 flag: train
 
 # Log
@@ -9,7 +9,7 @@ log_dir: "./log/deepfake_mesorch_max_train"
 if_predict_label: true
 if_predict_mask: false
 
-iml_config: '/mnt/data1/xuekang/workspace/ForensicHub/ForensicHub/statics/deepfake/mesorch_config.yaml'
+iml_config: '/mnt/data1/xuekang/workspace/ForensicHub/ForensicHub/statics/deepfake/catnet_config.yaml'
 
 rgb_dir : '/mnt/data1/public_datasets/Deepfake'
 
