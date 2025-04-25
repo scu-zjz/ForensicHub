@@ -1,0 +1,11 @@
+{
+  "_model_class": "Segformer",
+  "activation": null,
+  "aux_params": null,
+  "classes": 150,
+  "decoder_segmentation_channels": 768,
+  "encoder_depth": 5,
+  "encoder_name": "mit_b5",
+  "encoder_weights": null,
+  "in_channels": 3
+}
