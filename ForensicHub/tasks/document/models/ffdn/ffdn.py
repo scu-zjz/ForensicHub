@@ -5,9 +5,9 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.distributed as dist
 from torch.autograd import Variable
-from fph import FPH
-from dwt import DWTFPN
-from backbone_convnext import ConvNeXt
+from .fph import FPH
+from .dwt import DWTFPN
+from .backbone_convnext import ConvNeXt
 import torch.nn.functional as F
 from timm.models.layers import trunc_normal_, DropPath
 from functools import partial
