@@ -185,6 +185,11 @@ def register_postfunc(name: Optional[Union[str, List[str]]] = None, force: bool 
     return POSTFUNCS.register_module(name=name, force=force)
 
 
+def register_evaluator(name: Optional[Union[str, List[str]]] = None, force: bool = False):
+    """Register a post-processing function."""
+    return EVALUATORS.register_module(name=name, force=force)
+
+
 def build_from_registry(registry, config_args):
     # 从字典中获取 class 名称
     name = config_args["name"]  # 直接从字典中访问

@@ -63,7 +63,7 @@ def fft_features(cross_diff: torch.Tensor, periods=[0, 2, 4, 8]) -> torch.Tensor
     return torch.cat(features, dim=1)
 
 
-@register_model("synthbuster")
+@register_model("Synthbuster")
 class Synthbuster(BaseModel):
     def __init__(self):
         super(Synthbuster, self).__init__()

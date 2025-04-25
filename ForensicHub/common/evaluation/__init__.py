@@ -1,6 +1,10 @@
 import IMDLBenCo.evaluation
 from IMDLBenCo.evaluation import *
 from ForensicHub import EVALUATORS
+from .AP import ImageAP
+from .MCC import ImageMCC
+from .TNR import ImageTNR
+from .TPR import ImageTPR
 
 # 确保 AbstractEvaluator 被导入，用于后续检查
 from IMDLBenCo.evaluation.abstract_class import AbstractEvaluator

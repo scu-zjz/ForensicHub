@@ -1,9 +1,9 @@
 # DDP
-gpus: "0,1,2,3"
+gpus: "4,5"
 flag: train
 
 # Log
-log_dir: "./log/aigc_resnet_df_train"
+log_dir: "./log/aigc_hifinet_df_train"
 
 # Task
 if_predict_label: true
@@ -11,11 +11,7 @@ if_predict_mask: false
 
 # Model
 model:
-  name: Resnet50
-  # Model specific setting
-  init_config:
-    pretrained: true
-    num_classes: 1
+  name: HiFi_Net
 
 # Train dataset
 train_dataset:
@@ -35,20 +31,19 @@ test_dataset:
 # Transform
 transform:
   name: AIGCTransform
+  init_config:
+    norm_type: standard
 
 # Evaluators
 evaluator:
   - name: ImageF1
     init_config:
       threshold: 0.5
-  - name: ImageAUC
-    init_config:
-      threshold: 0.5
 
 # Training related
-batch_size: 512
-test_batch_size: 4
-epochs: 10
+batch_size: 32
+test_batch_size: 32
+epochs: 20
 accum_iter: 1
 record_epoch: 0  # Save the best only after record epoch.
 
@@ -61,13 +56,13 @@ log_per_epoch_count: 20
 
 # DDP & AMP settings
 find_unused_parameters: true
-if_not_amp: true
+if_not_amp: false
 
 # Optimizer parameters
 weight_decay: 0.05
-lr: 1e-4
+lr: 0.0001
 blr: 0.001
-min_lr: 0.001
+min_lr: 0.00001
 warmup_epochs: 1
 
 # Device and training control

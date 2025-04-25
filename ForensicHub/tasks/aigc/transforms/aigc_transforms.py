@@ -8,16 +8,35 @@ from ForensicHub.registry import register_transform
 class AIGCTransform(BaseTransform):
     """Transform class for AIGC tasks."""
 
-    def __init__(self, output_size: tuple = (224, 224)):
+    def __init__(self, output_size: tuple = (224, 224), norm_type='image_net'):
         super().__init__()
         self.output_size = output_size
+        self.norm_type = norm_type
 
     def get_post_transform(self) -> albu.Compose:
         """Get post-processing transforms like normalization and conversion to tensor."""
-        return albu.Compose([
-            albu.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            ToTensorV2(transpose_mask=True)
-        ])
+        if self.norm_type == 'image_net':
+            return albu.Compose([
+                albu.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                ToTensorV2(transpose_mask=True)
+            ])
+        elif self.norm_type == 'clip':
+            return albu.Compose([
+                albu.Normalize(mean=[0.48145466, 0.4578275, 0.40821073], std=[0.26862954, 0.26130258, 0.27577711]),
+                ToTensorV2(transpose_mask=True)
+            ])
+        elif self.norm_type == 'standard':
+            return albu.Compose([
+                albu.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+                ToTensorV2(transpose_mask=True)
+            ])
+        elif self.norm_type == 'none':
+            return albu.Compose([
+                albu.ToFloat(max_value=255.0),  # 确保 uint8 转 float32，并映射到 [0, 1]
+                ToTensorV2(transpose_mask=True)
+            ])
+        else:
+            raise NotImplementedError("Normalization type not supported, use image_net, clip, standard or none")
 
     def get_train_transform(self) -> albu.Compose:
         """Get training transforms."""

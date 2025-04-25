@@ -1,9 +1,9 @@
 # DDP
-gpus: "0,1,2,3"
+gpus: "4,5"
 flag: train
 
 # Log
-log_dir: "./log/aigc_hifinet_df_train"
+log_dir: "./log/aigc_univfd_df_train"
 
 # Task
 if_predict_label: true
@@ -11,7 +11,7 @@ if_predict_mask: false
 
 # Model
 model:
-  name: HiFi_Net
+  name: UnivFD
 
 # Train dataset
 train_dataset:
@@ -23,30 +23,29 @@ train_dataset:
 #  Test dataset (one or many)
 test_dataset:
   - name: AIGCLabelDataset
-    dataset_name: DiffusionForensics_test
+    dataset_name: DiffusionForensics_val
     init_config:
       image_size: 224
-      path: /mnt/data1/public_datasets/AIGC/DiffusionForensics/images/test.json
+      path: /mnt/data1/public_datasets/AIGC/DiffusionForensics/images/val.json
 
 # Transform
 transform:
   name: AIGCTransform
+  init_config:
+    norm_type: clip
 
 # Evaluators
 evaluator:
   - name: ImageF1
     init_config:
       threshold: 0.5
-  - name: ImageAUC
-    init_config:
-      threshold: 0.5
 
 # Training related
-batch_size: 64
-test_batch_size: 4
+batch_size: 256
+test_batch_size: 64
 epochs: 20
 accum_iter: 1
-record_epoch: 0  # Save the best only after record epoch.
+record_epoch: 20  # Save the best only after record epoch.
 
 # Test related
 no_model_eval: false
@@ -63,7 +62,7 @@ if_not_amp: true
 weight_decay: 0.05
 lr: 1e-4
 blr: 0.001
-min_lr: 0.001
+min_lr: 1e-5
 warmup_epochs: 1
 
 # Device and training control

@@ -1,0 +1,86 @@
+# DDP
+gpus: "4,5"
+flag: test
+
+# Log
+log_dir: "./log/aigc_univfd_df_test"
+
+# Task
+if_predict_label: true
+if_predict_mask: false
+
+no_model_eval: false
+
+# Model
+model:
+  name: UnivFD
+
+#  Test dataset (one or many)
+test_dataset:
+  - name: AIGCLabelDataset
+    dataset_name: DiffusionForensics_test
+    init_config:
+      image_size: 224
+      path: /mnt/data1/public_datasets/AIGC/DiffusionForensics/images/test.json
+  - name: JsonDataset
+    dataset_name: COVERAGE
+    init_config:
+      image_size: 224
+      path: /mnt/data0/public_datasets/IML/coverage_full.json
+      # Dataset specific setting
+      is_resizing: true
+      is_padding: false
+  - name: JsonDataset
+    dataset_name: Columbia
+    init_config:
+      image_size: 224
+      path: /mnt/data0/public_datasets/IML/Columbia_full.json
+      # Dataset specific setting
+      is_resizing: true
+      is_padding: false
+  - name: JsonDataset
+    dataset_name: IMD2020
+    init_config:
+      image_size: 224
+      path: /mnt/data0/public_datasets/IML/IMD_20_1024_full.json
+      # Dataset specific setting
+      is_resizing: true
+      is_padding: false
+  - name: JsonDataset
+    dataset_name: NIST16
+    init_config:
+      image_size: 224
+      path: /mnt/data0/public_datasets/IML/NIST16_full.json
+      # Dataset specific setting
+      is_resizing: true
+      is_padding: false
+
+# Transform
+transform:
+  name: AIGCTransform
+  init_config:
+    norm_type: clip
+
+# Evaluators
+evaluator:
+  - name: ImageF1
+  - name: ImageAUC
+  - name: ImageAP
+  - name: ImageMCC
+  - name: ImageTNR
+  - name: ImageTPR
+  - name: ImageAccuracy
+
+checkpoint_path: /mnt/data1/dubo/workspace/ForensicHub/log/aigc_univfd_df_train
+test_batch_size: 64
+
+# Device
+device: "cuda"
+num_workers: 8
+pin_mem: true
+
+# Distributed training parameters
+world_size: 1
+local_rank: -1
+dist_on_itp: false
+dist_url: "env://"

@@ -25,6 +25,7 @@ class UnivFD(BaseModel):
 
         # self.preprecess will not be used during training, which is handled in Dataset class
         self.model, self.preprocess = clip.load(name, device="cpu")
+        self.model.requires_grad_(False)
         self.fc = nn.Linear(CHANNELS[name], num_classes)
 
     def forward(self, image, label, **kwargs) -> Dict[str, Any]:
