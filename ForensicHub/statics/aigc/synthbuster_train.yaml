@@ -1,0 +1,81 @@
+# DDP
+gpus: "2,3"
+flag: train
+
+# Log
+log_dir: "./log/aigc_synthbuster_df_train"
+
+# Task
+if_predict_label: true
+if_predict_mask: false
+
+# Model
+model:
+  name: Synthbuster
+
+# Train dataset
+train_dataset:
+  name: AIGCLabelDataset
+  dataset_name: DiffusionForensics_train
+  init_config:
+    image_size: 224
+    path: /mnt/data1/public_datasets/AIGC/DiffusionForensics/images/train.json
+#  Test dataset (one or many)
+test_dataset:
+  - name: AIGCLabelDataset
+    dataset_name: DiffusionForensics_val
+    init_config:
+      image_size: 224
+      path: /mnt/data1/public_datasets/AIGC/DiffusionForensics/images/val.json
+
+# Transform
+transform:
+  name: AIGCTransform
+  init_config:
+    norm_type: none
+
+# Evaluators
+evaluator:
+  - name: ImageF1
+    init_config:
+      threshold: 0.5
+
+# Training related
+batch_size: 768
+test_batch_size: 128
+epochs: 20
+accum_iter: 1
+record_epoch: 20  # Save the best only after record epoch.
+
+# Test related
+no_model_eval: false
+test_period: 1
+
+# Logging & TensorBoard
+log_per_epoch_count: 20
+
+# DDP & AMP settings
+find_unused_parameters: true
+if_not_amp: true
+
+# Optimizer parameters
+weight_decay: 0.05
+lr: 1e-4
+blr: 0.001
+min_lr: 1e-5
+warmup_epochs: 1
+
+# Device and training control
+device: "cuda"
+seed: 42
+resume: ""
+start_epoch: 0
+num_workers: 8
+pin_mem: true
+
+# Distributed training parameters
+world_size: 1
+local_rank: -1
+dist_on_itp: false
+dist_url: "env://"
+

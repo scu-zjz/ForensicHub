@@ -10,6 +10,7 @@ from ForensicHub.registry import register_model
 Ai-generated image detection using a cross-attention enhanced dual-stream network
 '''
 
+
 @register_model("DualNet")
 class DualNet(BaseModel):
     def __init__(self):

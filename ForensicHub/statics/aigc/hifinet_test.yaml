@@ -58,18 +58,21 @@ test_dataset:
 # Transform
 transform:
   name: AIGCTransform
+  init_config:
+    norm_type: standard
 
 # Evaluators
 evaluator:
   - name: ImageF1
-    init_config:
-      threshold: 0.5
   - name: ImageAUC
-    init_config:
-      threshold: 0.5
+  - name: ImageAP
+  - name: ImageMCC
+  - name: ImageTNR
+  - name: ImageTPR
+  - name: ImageAccuracy
 
 checkpoint_path: /mnt/data1/dubo/workspace/ForensicHub/log/aigc_hifinet_df_train
-test_batch_size: 8
+test_batch_size: 32
 
 # Device
 device: "cuda"
