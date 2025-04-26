@@ -58,7 +58,7 @@ log_per_epoch_count: 20
 
 # DDP & AMP settings
 find_unused_parameters: false
-if_not_amp: true
+use_amp: true
 
 # Optimizer parameters
 weight_decay: 0.05

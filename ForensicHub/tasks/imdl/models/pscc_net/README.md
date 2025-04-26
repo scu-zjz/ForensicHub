@@ -1,1 +1,0 @@
-The HRNET pretrain weights are from the official repository: https://github.com/proteus1991/PSCC-Net.
