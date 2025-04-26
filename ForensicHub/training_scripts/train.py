@@ -26,6 +26,7 @@ def get_args_parser():
     # model_args, train_dataset_args, transform_args are dict type, test_dataset_args is dict list.
     args, model_args, train_dataset_args, test_dataset_args, transform_args, evaluator_args = split_config(config)
     add_attr(args, output_dir=args.log_dir)
+    add_attr(args, if_not_amp=not args.use_amp)
     return args, model_args, train_dataset_args, test_dataset_args, transform_args, evaluator_args
 
 
