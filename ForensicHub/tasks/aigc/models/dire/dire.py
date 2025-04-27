@@ -1,16 +1,7 @@
 import torch
-import torch.nn as nn
-from typing import Dict, Any, Tuple
-import torch.nn.functional as F
 
-from .guided_diffusion import dist_util, logger
-from .guided_diffusion.image_datasets import load_data_for_reverse
 from .guided_diffusion.script_util import (
-    NUM_CLASSES,
-    model_and_diffusion_defaults,
     create_model_and_diffusion,
-    add_dict_to_argparser,
-    args_to_dict,
 )
 
 from ForensicHub.core.base_model import BaseModel
@@ -20,6 +11,7 @@ from ForensicHub.common.backbones.resnet import Resnet50
 '''
 Dire for diffusion-generated image detection
 '''
+
 
 @register_model("Dire")
 class Dire(BaseModel):
