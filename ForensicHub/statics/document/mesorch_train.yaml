@@ -1,0 +1,94 @@
+# DDP
+gpus: "0,1,2,3,4,5,6,7"
+flag: train
+
+# Log
+log_dir: "./log/doc_mesorch_train_2"
+
+# Task
+if_predict_label: false
+if_predict_mask: true
+
+# Model
+model:
+  name: Mesorch
+  init_config:
+    conv_pretrain: true
+    seg_pretrain_path: /mnt/data0/xuekang/workspace/convswin/mit_b3.pth
+
+# Train dataset
+train_dataset:
+  name: DocTamperData
+  dataset_name: DocTamperData_train
+  init_config:
+    path: /mnt/data0/public_datasets/Doc/DocTamperV1/DocTamperV1-TrainingSet
+#  Test dataset (one or many)
+test_dataset:
+  - name: DocTamperData
+    dataset_name: DocTamperData_test
+    init_config:
+      path: /mnt/data0/public_datasets/Doc/DocTamperV1/DocTamperV1-TestingSet
+      train: false
+  - name: DocTamperData
+    dataset_name: DocTamperData_FCD
+    init_config:
+      path: /mnt/data0/public_datasets/Doc/DocTamperV1/DocTamperV1-FCD
+      train: false
+  - name: DocTamperData
+    dataset_name: DocTamperData_SCD
+    init_config:
+      path: /mnt/data0/public_datasets/Doc/DocTamperV1/DocTamperV1-SCD
+      train: false
+
+# Transform
+transform:
+  name: DocTransform
+  init_config:
+    norm_type: image_net
+
+# Evaluators
+evaluator:
+  - name: PixelF1
+    init_config:
+      threshold: 0.5
+
+# Training related
+batch_size: 12
+test_batch_size: 8
+epochs: 10
+accum_iter: 1
+record_epoch: 0  # Save the best only after record epoch.
+
+# Test related
+no_model_eval: false
+test_period: 1
+
+# Logging & TensorBoard
+log_per_epoch_count: 20
+
+# DDP & AMP settings
+find_unused_parameters: true
+use_amp: true
+
+# Optimizer parameters
+opt: 'Adam'
+weight_decay: 0.05
+lr: 1e-4
+blr: 0.001
+min_lr: 5e-7
+warmup_epochs: 1
+
+# Device and training control
+device: "cuda"
+seed: 42
+resume: ""
+start_epoch: 0
+num_workers: 8
+pin_mem: true
+
+# Distributed training parameters
+world_size: 1
+local_rank: -1
+dist_on_itp: false
+dist_url: "env://"
+

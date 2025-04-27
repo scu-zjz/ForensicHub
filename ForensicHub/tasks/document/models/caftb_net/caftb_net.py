@@ -81,9 +81,10 @@ class SoftDiceLossV1(nn.Module):
 
 @register_model("CAFTB_Net")
 class CAFTB_Net(BaseModel):
-    def __init__(self, cnn_model_name='resnetv2_50d_gn.ah_in1k',
-                 vit_pretrained_path='/mnt/data1/public_datasets/Doc/Hub/caftb_net/segformer-b5-640x640-ade-160k'):
+    def __init__(self,
+                 vit_pretrained_path='/mnt/data0/public_datasets/Doc/Hub/caftb-net/segformer-b5-640x640-ade-160k'):
         super(CAFTB_Net, self).__init__()
+        cnn_model_name='resnetv2_50d_gn.ah_in1k'
         self.cnn = timm.create_model(cnn_model_name, pretrained=False, features_only=True)
         self.cnn.stem_conv3 = nn.Conv2d(32, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
         self.cnn.stages_3.blocks[0].downsample.pool = nn.Identity()
@@ -142,15 +143,18 @@ class CAFTB_Net(BaseModel):
         xc = torch.cat([self.cafms[i](xc[i], xt[i]) for i in range(4)], 1)
         output = self.decoder(xc)
         seg_loss, output = self.cal_seg_loss(output, mask)
+        pred_mask = F.softmax(output, dim=1)[:,1:]
         output_dict = {
             "backward_loss": seg_loss,
-            "pred_mask": output,
+
+            "pred_mask": pred_mask,
+
             "visual_loss": {
                 "seg_loss": seg_loss,
                 "combined_loss": seg_loss
             },
             "visual_image": {
-                "pred_mask": output,
+                "pred_mask": pred_mask,
             }
         }
         return output_dict
