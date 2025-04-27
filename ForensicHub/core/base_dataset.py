@@ -17,7 +17,7 @@ class BaseDataset(Dataset, ABC):
                  common_transform: Optional[Any] = None,
                  post_transform: Optional[Any] = None,
                  img_loader: Any = None,
-                 post_funcs: Optional[List[callable]] = None,
+                 post_funcs: Any = None,
                  **kwargs):
         """Initialize the dataset.
         

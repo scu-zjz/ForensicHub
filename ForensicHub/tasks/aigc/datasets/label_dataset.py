@@ -16,8 +16,10 @@ class AIGCLabelDataset(BaseDataset):
     def __init__(self,
                  path: str,
                  image_size: int = 224,
+                 gen_mask: bool = False,
                  **kwargs):
         self.image_size = image_size
+        self.gen_mask = gen_mask
         super().__init__(path=path, **kwargs)
 
     def _init_dataset_path(self) -> None:
@@ -59,9 +61,12 @@ class AIGCLabelDataset(BaseDataset):
             "label": torch.tensor(label, dtype=torch.float)
         }
 
+        if self.gen_mask:
+            mask = torch.full((image.shape[1], image.shape[2]), fill_value=label, dtype=torch.float)
+            output["mask"] = mask
+
         # Apply post-processing functions
         if self.post_funcs:
-            for func in self.post_funcs:
-                output = func(output)
+            self.post_funcs(output)
 
         return output

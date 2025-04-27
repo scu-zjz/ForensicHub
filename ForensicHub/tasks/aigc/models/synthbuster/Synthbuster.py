@@ -9,7 +9,7 @@ from ForensicHub.core.base_model import BaseModel
 from ForensicHub.registry import register_model
 
 '''
-synthbuster: Towards detection of diffusion model generated images
+Synthbuster: Towards detection of diffusion model generated images
 '''
 
 
