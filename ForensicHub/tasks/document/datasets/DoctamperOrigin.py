@@ -21,10 +21,13 @@ import torch.distributed as dist
 from torch.utils.data import Dataset
 from typing import List, Optional, Tuple, Union, no_type_check
 from ForensicHub.registry import register_dataset
+from IMDLBenCo.transforms import EdgeMaskGenerator
+from IMDLBenCo.model_zoo.mvss_net.mvssnet import MVSSNet
 
-register_dataset('DocTamperDataOrigin')
+
+# register_dataset('DocTamperDataOrigin')
 class DocTamperDataOrigin(Dataset):
-    def __init__(self, root, train=True, crop_size=512, jpeg=True, use_dct=False, crop_test=False, suffix_img='.jpg', suffix_mask='.png'):
+    def __init__(self, root, train=True, crop_size=512, jpeg=True, use_dct=False, crop_test=False, suffix_img='.jpg', suffix_mask='.png',edge_width=None):
         self.jpeg = True # must use jpeg augmentation
         self.train = train # train or test
         self.use_dct = use_dct # return dct or not
@@ -40,7 +43,7 @@ class DocTamperDataOrigin(Dataset):
         if use_dct:
             with open('/mnt/data0/public_datasets/Doc/DataLoaders/other_files/qt_table_ori.pk', 'rb') as f:
                 self.qtables = pickle.load(f)
-
+        self.edge_mask_generator = None if edge_width is None else EdgeMaskGenerator(edge_width)
     def __len__(self):
         return self.lens
 
@@ -71,25 +74,36 @@ class DocTamperDataOrigin(Dataset):
         img = self.totsr(img)
         mask = torch.LongTensor(mask).unsqueeze(0)
         label = (torch.sum(mask, dim=(0, 1, 2)) != 0).long()
+        
         if self.use_dct:
-            return {'image': img, 'mask': mask, 'label':label, 'DCT_coef': np.clip(np.abs(dct),0,20), 'qtables': qtb}
+            data_dict = {'image': img, 'mask': mask, 'label':label, 'DCT_coef': torch.tensor(np.clip(np.abs(dct),0,20)), 'qtables': torch.tensor(qtb)}
         else:
-            return {'image': img, 'mask': mask, 'label':label}
+            data_dict = {'image': img, 'mask': mask, 'label':label}
 
+        if self.edge_mask_generator != None: 
+            gt_img_edge = self.edge_mask_generator(mask)[0]
+            data_dict['edge_mask'] = torch.tensor(gt_img_edge)
+        return data_dict
+    
 if __name__=='__main__':
-    data_names = (('DocTamperV1-TrainingSet', False), ('DocTamperV1-TrainingSet', True))
+    data_names = (('/mnt/data0/public_datasets/Doc/DocTamperV1/DocTamperV1-TrainingSet', False), ('DocTamperV1-TrainingSet', True))
     for use_dct in (True, False):
         for v in data_names:
-            data = DocTamperDataOrigin(root='../'+v[0], train=v[1], use_dct=use_dct)
+            data = DocTamperDataOrigin(root=v[0], train=v[1], use_dct=use_dct, edge_width=7)
             for i in range(10):
-                item = data.__getitem__(0)
-                img = item['img']
+                item = data.__getitem__(i)
+                img = item['image']
                 mask = item['mask']
                 if use_dct:
-                    dct = item['dct']
-                    qtb = item['qtb']
+                    dct = item['DCT_coef']
+                    qtb = item['qtables']
                     print(data_names, i, img.shape, mask.shape, dct.shape, qtb.shape)
                 else:
                     print(data_names, i, img.shape, mask.shape)
-             
-            
+                
+
+                # import pdb;pdb.set_trace()
+                # item = {k:v.unsqueeze(0) for k, v in item.items()}
+                # for k,v in item.items():
+                #     v = v.unsqueeze(0)
+                # model = MVSSNet()
