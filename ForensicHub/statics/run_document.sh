@@ -1,10 +1,8 @@
 #!/bin/bash
 
-echo "开始休眠 5 小时..."
-sleep 5h
-echo "现在执行代码！"
 
-yaml_config="/mnt/data0/xuekang/workspace/ForensicHub/ForensicHub/statics/document/mvss_train.yaml"
+
+yaml_config="/mnt/data0/xuekang/workspace/ForensicHub/ForensicHub/statics/document/trufor_train.yaml"
 
 # 从 yaml 中读取 gpus、log_dir 和 flag
 gpus=$(python -c "import yaml; print(yaml.safe_load(open('$yaml_config'))['gpus'])")
@@ -22,7 +20,7 @@ mkdir -p ${base_dir}
 if [ "$flag" = "test" ]; then
     script_path="ForensicHub/training_scripts/test.py"
 elif [ "$flag" = "train" ]; then
-    script_path="ForensicHub/training_scripts/train.py"
+    script_path="ForensicHub/training_scripts/train_doc.py"
 else
     echo "配置文件中的 flag 字段必须是 'test' 或 'train'，当前是 '$flag'"
     exit 1

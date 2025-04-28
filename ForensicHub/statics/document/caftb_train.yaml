@@ -3,7 +3,7 @@ gpus: "0,1,2,3,4,5,6,7"
 flag: train
 
 # Log
-log_dir: "./log/doc_caftb_train"
+log_dir: "./log/doc_caftb_train_2"
 
 # Task
 if_predict_label: false

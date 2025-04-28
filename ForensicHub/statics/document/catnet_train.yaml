@@ -3,7 +3,7 @@ gpus: "0,1,2,3,4,5,6,7"
 flag: train
 
 # Log
-log_dir: "./log/doc_mesorch_train_3"
+log_dir: "./log/doc_catnet_train"
 
 # Task
 if_predict_label: false
@@ -11,10 +11,9 @@ if_predict_mask: true
 
 # Model
 model:
-  name: Mesorch
+  name: Cat_Net
   init_config:
-    conv_pretrain: true
-    seg_pretrain_path: /mnt/data0/xuekang/workspace/convswin/mit_b3.pth
+    cfg_file: /mnt/data0/xuekang/workspace/ForensicHub/ForensicHub/statics/document/cat_net.yaml
 
 # Train dataset
 train_dataset:
@@ -71,12 +70,12 @@ find_unused_parameters: true
 use_amp: true
 
 # Optimizer parameters
-opt: 'Adam'
+opt: 'AdamW'
 weight_decay: 0.05
 lr: 1e-4
 blr: 0.001
 min_lr: 5e-7
-warmup_epochs: 0
+warmup_epochs: 1
 
 # Device and training control
 device: "cuda"

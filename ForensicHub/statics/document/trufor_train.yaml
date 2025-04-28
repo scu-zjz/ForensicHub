@@ -3,18 +3,19 @@ gpus: "0,1,2,3,4,5,6,7"
 flag: train
 
 # Log
-log_dir: "./log/doc_mesorch_train_3"
+log_dir: "./log/doc_trufor_train"
 
 # Task
 if_predict_label: false
 if_predict_mask: true
 
 # Model
-model:
-  name: Mesorch
+model: 
+  name: 'Trufor'
   init_config:
-    conv_pretrain: true
-    seg_pretrain_path: /mnt/data0/xuekang/workspace/convswin/mit_b3.pth
+    np_pretrain_weights: '/mnt/data0/xuekang/workspace/convswin/noiseprint.pth'
+    mit_b2_pretrain_weights: '/mnt/data0/xuekang/workspace/convswin/mit_b2.pth'
+    config_path: '/mnt/data0/xuekang/workspace/ForensicHub/ForensicHub/statics/document/trufor_config.yaml'
 
 # Train dataset
 train_dataset:
