@@ -1,6 +1,5 @@
 #!/bin/bash
-
-yaml_config="/mnt/data1/xuekang/workspace/ForensicHub/ForensicHub/statics/deepfake/train_deepfake_mesorch_model.yaml"
+yaml_config="/mnt/data1/xuekang/workspace/ForensicHub/ForensicHub/statics/deepfake/train_deepfake_trufor_model.yaml"
 
 # 从 yaml 中读取 gpus、log_dir 和 flag
 gpus=$(python -c "import yaml; print(yaml.safe_load(open('$yaml_config'))['gpus'])")

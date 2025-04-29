@@ -1,9 +1,9 @@
 # DDP
-gpus: "5"
+gpus: "0,1,2,3"
 flag: train
 
 # Log
-log_dir: "./log/deepfake_mesorch_max_train"
+log_dir: "./log/deepfake_catnet_train"
 
 # Task
 if_predict_label: true

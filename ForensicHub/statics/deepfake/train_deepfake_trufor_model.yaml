@@ -3,7 +3,7 @@ gpus: "0,1,2,3"
 flag: train
 
 # Log
-log_dir: "./log/deepfake_iml_vit_train"
+log_dir: "./log/deepfake_trufor_train"
 
 # Task
 if_predict_label: true
@@ -45,14 +45,14 @@ log_per_epoch_count: 1
 
 # DDP & AMP settings
 find_unused_parameters: true
-if_not_amp: false
+if_not_amp: true
 
 # Optimizer parameters
-weight_decay: 0.0005
-lr: 2e-4
+weight_decay: 0.05
+lr: 1e-4
 blr: 0.001
-min_lr: 2e-4
-warmup_epochs: 0
+min_lr: 5e-7
+warmup_epochs: 1
 
 # Device and training control
 device: "cuda"
