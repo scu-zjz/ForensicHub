@@ -2,3 +2,4 @@
 *.pyc
 forensichub.egg-info/
 log/*
+*.pth

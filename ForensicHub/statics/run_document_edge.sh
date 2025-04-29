@@ -1,15 +1,9 @@
 #!/bin/bash
 
-# 休眠结束后的操作
-echo "休眠4小时后执行"
+echo 'Sleep 4.1h'
+sleep 4.1h
 
-# 休眠 4 小时
-sleep 15000
-
-
-
-
-yaml_config="/mnt/data0/xuekang/workspace/ForensicHub/ForensicHub/statics/document/mvss_train.yaml"
+yaml_config="/mnt/data0/xuekang/workspace/ForensicHub/ForensicHub/statics/document/iml_vit_train.yaml"
 
 # 从 yaml 中读取 gpus、log_dir 和 flag
 gpus=$(python -c "import yaml; print(yaml.safe_load(open('$yaml_config'))['gpus'])")

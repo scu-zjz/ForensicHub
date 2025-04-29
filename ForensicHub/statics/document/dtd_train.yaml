@@ -3,7 +3,7 @@ gpus: "0,1,2,3,4,5,6,7"
 flag: train
 
 # Log
-log_dir: "./log/doc_caftb_train_3"
+log_dir: "./log/doc_dtd_train"
 
 # Task
 if_predict_label: false
@@ -11,7 +11,7 @@ if_predict_mask: true
 
 # Model
 model:
-  name: CAFTB_Net
+  name: DTD
 
 # # Train dataset
 # train_dataset:

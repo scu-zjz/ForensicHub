@@ -72,7 +72,7 @@ class DocTamperDataOrigin(Dataset):
                     print("WARNING! The image quality is too low, exceeding the model's capabilities. This will lead to bad results!")
                     qtb = self.qtables[75]
         img = self.totsr(img)
-        mask = torch.LongTensor(mask).unsqueeze(0)
+        mask = torch.LongTensor(mask).unsqueeze(0).float()
         label = (torch.sum(mask, dim=(0, 1, 2)) != 0).long()
         
         if self.use_dct:
@@ -82,7 +82,7 @@ class DocTamperDataOrigin(Dataset):
 
         if self.edge_mask_generator != None: 
             gt_img_edge = self.edge_mask_generator(mask)[0]
-            data_dict['edge_mask'] = torch.tensor(gt_img_edge)
+            data_dict['edge_mask'] = torch.tensor(gt_img_edge).float()
         return data_dict
     
 if __name__=='__main__':

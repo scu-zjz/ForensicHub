@@ -504,12 +504,12 @@ class DTD(BaseModel):
         ce_loss = F.cross_entropy(pred, gt) + self.dice(pred, gt) if self.use_dice_loss else F.cross_entropy(pred, gt)
         return ce_loss, pred
 
-    def forward(self, image, dct, qt, mask, **kwargs):
+    def forward(self, image, DCT_coef, qtables, mask, **kwargs):
         x = image
         mask = mask.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]
-        dct = dct.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]
+        DCT_coef = DCT_coef.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]
         features = self.vph.forward_features(self.addcoords(x), end_index=2)
-        features[1] = self.FU(torch.cat((features[1], self.fph(dct, qt)), 1))
+        features[1] = self.FU(torch.cat((features[1], self.fph(DCT_coef, qtables)), 1))
         rst = self.swin.layers[0](features[1].flatten(2).transpose(1, 2).contiguous())
         N, L, C = rst.shape
         H = W = int(L ** (1 / 2))
