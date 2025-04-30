@@ -1,0 +1,5 @@
+# 忽略所有 pyc 文件
+*.pyc
+forensichub.egg-info/
+log/*
+*.pth

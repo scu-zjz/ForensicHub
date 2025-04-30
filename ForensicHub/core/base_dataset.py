@@ -13,7 +13,7 @@ class BaseDataset(Dataset, ABC):
     """
 
     def __init__(self,
-                 path: str,
+                 path: Union[str, List[str]],
                  common_transform: Optional[Any] = None,
                  post_transform: Optional[Any] = None,
                  img_loader: Any = None,
