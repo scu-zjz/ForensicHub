@@ -2,7 +2,7 @@
 
 
 
-yaml_config="/mnt/data0/xuekang/workspace/ForensicHub/ForensicHub/statics/document/caftb_train.yaml"
+yaml_config="/mnt/data0/xuekang/workspace/ForensicHub/ForensicHub/statics/document/tifdm_train.yaml"
 
 # 从 yaml 中读取 gpus、log_dir 和 flag
 gpus=$(python -c "import yaml; print(yaml.safe_load(open('$yaml_config'))['gpus'])")

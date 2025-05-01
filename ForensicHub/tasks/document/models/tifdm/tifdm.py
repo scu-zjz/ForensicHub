@@ -73,7 +73,7 @@ class EfficientNetB3(nn.Module):
         return out2, out3, out4, out5
 
     def initialize(self):
-        self.load_state_dict(torch.load('efficientnet-b3-5fb5a3c3.pth'), strict=False)
+        self.load_state_dict(torch.load('/mnt/data0/public_datasets/Doc/Hub/tifdm/efficientnet-b3-5fb5a3c3.pth'), strict=False)
 
 
 class MBConvBlock(nn.Module):
@@ -233,6 +233,7 @@ class Tifdm(BaseModel):
         pred1 = self.decoder(out2h, out3h, out4h, out5v)
         output = self.linearp(pred1)
         seg_loss, output = self.cal_seg_loss(output, mask)
+        output = F.softmax(output,dim=1)[:,1:]
         output_dict = {
             "backward_loss": seg_loss,
             "pred_mask": output,
@@ -255,4 +256,5 @@ if __name__ == "__main__":
     img = torch.ones((1, 3, 64, 64))
     mask = torch.ones((1, 1, 64, 64), dtype=torch.int64)
     pred = model(img, mask)
-    print(pred)
+    # print(pred)
+    import pdb;pdb.set_trace()

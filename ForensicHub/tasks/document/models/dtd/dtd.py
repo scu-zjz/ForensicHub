@@ -451,7 +451,7 @@ class DTD(BaseModel):
             self.dice = SoftDiceLossV1()
 
     def init_vph(self, ):
-        weights = torch.load('convnext_small.pth')['state_dict']
+        weights = torch.load('/mnt/data0/public_datasets/Doc/Hub/dtd/convnext_small.pth')['state_dict']
         weights['backbone.downsample_layers.0.0.weight'] = torch.cat(
             (weights['backbone.downsample_layers.0.0.weight'], weights['backbone.downsample_layers.0.0.weight']), 1)
         dels = [k for k in weights.keys() if not k.startswith('backbone.')]
@@ -467,7 +467,7 @@ class DTD(BaseModel):
         del self.vph.stages[2]
 
     def init_swin(self, ):
-        weights = torch.load('swintransformerv2_small.pth')['model']
+        weights = torch.load('/mnt/data0/public_datasets/Doc/Hub/dtd/swintransformerv2_small.pth')['model']
         self.swin.load_state_dict(weights)
         del self.swin.norm
         del self.swin.patch_embed
@@ -519,6 +519,8 @@ class DTD(BaseModel):
         decoder_output = self.decoder(*features)
         output = self.head(decoder_output)
         seg_loss, output = self.cal_seg_loss(output, mask)
+        output = F.softmax(output, dim=1)
+        output = output[:, 1:]
         output_dict = {
             "backward_loss": seg_loss,
             "pred_mask": output,

@@ -76,7 +76,7 @@ class DocTamperDataOrigin(Dataset):
         label = (torch.sum(mask, dim=(0, 1, 2)) != 0).long()
         
         if self.use_dct:
-            data_dict = {'image': img, 'mask': mask, 'label':label, 'DCT_coef': torch.tensor(np.clip(np.abs(dct),0,20)), 'qtables': torch.tensor(qtb)}
+            data_dict = {'image': img, 'mask': mask, 'label':label, 'DCT_coef': torch.tensor(np.clip(np.abs(dct),0,20)), 'qtables': torch.tensor(qtb).unsqueeze(0)}
         else:
             data_dict = {'image': img, 'mask': mask, 'label':label}
 
@@ -102,7 +102,7 @@ if __name__=='__main__':
                     print(data_names, i, img.shape, mask.shape)
                 
 
-                # import pdb;pdb.set_trace()
+                import pdb;pdb.set_trace()
                 # item = {k:v.unsqueeze(0) for k, v in item.items()}
                 # for k,v in item.items():
                 #     v = v.unsqueeze(0)

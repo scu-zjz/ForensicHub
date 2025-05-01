@@ -55,7 +55,7 @@ evaluator:
 # Training related
 batch_size: 12
 test_batch_size: 8
-epochs: 10
+epochs: 200
 accum_iter: 1
 record_epoch: 0  # Save the best only after record epoch.
 

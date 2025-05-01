@@ -18,13 +18,14 @@ import torch.optim as optim
 import torch.nn.functional as F
 import torch.distributed as dist
 from torch.utils.data import Dataset
-from crop_comb import crop_img_func
+# from crop_comb import crop_img_func
 from typing import List, Optional, Tuple, Union, no_type_check
 from ForensicHub.registry import register_dataset
+from IMDLBenCo.transforms import EdgeMaskGenerator
 
-@register_dataset("DocTamperData")
+# @register_dataset("OthersData")
 class OthersData(Dataset):
-    def __init__(self, root, train=True, crop_size=512, jpeg=True, dct_path=None, crop_test=True, suffix_img='.jpg', suffix_mask='.png'):
+    def __init__(self, root, train=True, crop_size=512, jpeg=True, dct_path='/mnt/data0/public_datasets/Doc/DataLoaders/other_files/qt_table_ori.pk', crop_test=True, suffix_img='.jpg', suffix_mask='.png', edge_width=7):
         self.jpeg = jpeg # use jpeg augmentation
         self.train = train # train or test
         self.dct_path = dct_path # return dct or not
@@ -49,8 +50,9 @@ class OthersData(Dataset):
             # /mnt/data1/public_datasets/Doc/DataLoaders/other_files/qt_table_ori.pk'
             with open(dct_path, 'rb') as f:
                 self.qtables = pickle.load(f)
-        if crop_test:
-            assert not train, 'crop test is only True in test mode.'
+        # if crop_test:
+        #     assert not train, 'crop test is only True in test mode.'
+        self.edge_mask_generator = None if edge_width is None else EdgeMaskGenerator(edge_width)
 
     def __len__(self):
         return self.lens
@@ -105,16 +107,17 @@ class OthersData(Dataset):
                 if qtb.max()>61:
                     print("WARNING! The image quality is too low, exceeding the model's capabilities. This will lead to bad results!")
                     qtb = self.qtables[75]
+    
         if not self.crop_test:
             if not self.train:
                 img = cv2.resize(img, (self.crop_size, self.crop_size))
             img = self.totsr(image=img)['image']
-            mask = torch.LongTensor(mask)
+            mask = torch.LongTensor(mask).unsqueeze(0).float()
+            label = (torch.sum(mask, dim=(0, 1, 2)) != 0).long()
             if self.dct_path:
-                dct = torch.LongTensor(np.clip(np.abs(dct),0,20)).contiguous()
-                return {'img': img, 'mask': mask, 'dct': dct, 'qtb': qtb}
+                data_dict = {'image': img, 'mask': mask, 'label':label, 'DCT_coef': torch.tensor(np.clip(np.abs(dct),0,20)), 'qtables': torch.tensor(qtb)}
             else:
-                return {'img': img, 'mask': mask}
+                data_dict = {'image': img, 'mask': mask, 'label':label}
         else:
             if self.dct_path:
                 imgs, meta_info, dcts = crop_img_func(img, img_name_ori=img_path.split('/')[-1], mask=None, jpg_dct=dct, crop_size=self.crop_size)
@@ -122,33 +125,19 @@ class OthersData(Dataset):
                     dcts[k] = torch.LongTensor(np.clip(np.abs(dcts[k]),0,20)).contiguous()
                 for k in imgs.keys():
                     imgs[k] = self.totsr(image=imgs[k])['image']
-                return {'img': imgs, 'mask': torch.LongTensor(mask), 'dct': dcts, 'qtb': qtb}
+                data_dict = {'image': img, 'mask': mask, 'label':label, 'DCT_coef': dcts, 'qtables': torch.tensor(qtb).unsqueeze(0)}
             else:
                 imgs, meta_info = crop_img_func(img, img_name_ori=img_path.split('/')[-1], mask=None, jpg_dct=None, crop_size=self.crop_size)
                 for k in imgs.keys():
                     imgs[k] = self.totsr(image=imgs[k])['image']
-                return {'img': imgs, 'mask': torch.LongTensor(mask)}
-
+                data_dict = {'image': img, 'mask': mask, 'label':label}
+            
+        if self.edge_mask_generator != None: 
+            gt_img_edge = self.edge_mask_generator(mask)[0]
+            data_dict['edge_mask'] = torch.tensor(gt_img_edge).float()
+        return data_dict
         
 if __name__=='__main__':
-    for use_dct in (True, False):
-        data_names = (('sroie_train', False),)
-        for v in data_names:
-            print('AAA', v, use_dct)
-            data = OthersData(root='/mnt/data1/public_datasets/Doc/T-SROIE/'+v[0], train=v[1], dct_path=use_dct)
-            for i in range(10):
-                item = data.__getitem__(0)
-                img = item['img']
-                mask = item['mask']
-                if use_dct:
-                    dct = item['dct']
-                    qtb = item['qtb']
-                    if v[1]:
-                        print(data_names, i, img.shape, mask.shape)
-                    else:
-                        print(data_names, i, [x.shape for x in img.values()], mask.shape, [x.shape for x in dct.values()], qtb.shape)
-                else:
-                    if v[1]:
-                        print(data_names, i, img.shape, mask.shape)
-                    else:
-                        print(data_names, i, [x.shape for x in img.values()], mask.shape, qtb.shape) 
+    train_dataset = OthersData('/mnt/data0/public_datasets/Doc/RealTextManipulation/RTM_train', train=True, edge_width=7)
+    train_dataset.__getitem__(0)
+    import pdb;pdb.set_trace()

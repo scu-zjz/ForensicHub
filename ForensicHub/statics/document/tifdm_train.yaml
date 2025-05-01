@@ -3,7 +3,7 @@ gpus: "0,1,2,3,4,5,6,7"
 flag: train
 
 # Log
-log_dir: "./log/doc_dtd_train"
+log_dir: "./log/doc_tifdm_train"
 
 # Task
 if_predict_label: false
@@ -11,7 +11,7 @@ if_predict_mask: true
 
 # Model
 model:
-  name: DTD
+  name: Tifdm
 
 # # Train dataset
 # train_dataset:
@@ -50,7 +50,7 @@ evaluator:
       threshold: 0.5
 
 # Training related
-batch_size: 8
+batch_size: 4
 test_batch_size: 8
 epochs: 10
 accum_iter: 1

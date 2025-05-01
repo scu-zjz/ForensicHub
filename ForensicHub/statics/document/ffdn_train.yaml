@@ -3,7 +3,7 @@ gpus: "0,1,2,3,4,5,6,7"
 flag: train
 
 # Log
-log_dir: "./log/doc_dtd_train"
+log_dir: "./log/doc_ffdn_train"
 
 # Task
 if_predict_label: false
@@ -11,7 +11,7 @@ if_predict_mask: true
 
 # Model
 model:
-  name: DTD
+  name: FFDN
 
 # # Train dataset
 # train_dataset:
