@@ -3,3 +3,6 @@
 forensichub.egg-info/
 log/*
 *.pth
+*.pt
+*.safetensors
+/tests
