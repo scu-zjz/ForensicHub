@@ -1,0 +1,150 @@
+# DDP
+gpus: "0,1"
+flag: train
+
+# Log
+log_dir: "./log/crossdataset_image/crossdataset_convnextsmall_bayer_train"
+
+# Task
+if_predict_label: true
+if_predict_mask: false
+
+# Model
+model:
+  name: BayerConvNextSmall
+  # Model specific setting
+  init_config:
+    output_type: label
+    image_size: 256
+
+# Train dataset
+train_dataset:
+  name: CrossDataset
+  dataset_name: CrossDataset
+  init_config:
+    dataset_config:
+      - name: IMDLCrossDataset
+        pic_nums: 12641
+        init_config:
+          image_size: 256
+          path: /mnt/data0/public_datasets/IML/CASIAv2_with_label.json
+      - name: AIGCCrossDataset
+        pic_nums: 12641
+        init_config:
+          image_size: 256
+          path:
+            - /mnt/data3/public_datasets/AIGC/GenImage/ADM_train.json
+            - /mnt/data3/public_datasets/AIGC/GenImage/BigGAN_train.json
+            - /mnt/data3/public_datasets/AIGC/GenImage/glide_train.json
+            - /mnt/data3/public_datasets/AIGC/GenImage/Midjourney_train.json
+            - /mnt/data3/public_datasets/AIGC/GenImage/stable_diffusion_v_1_4_train.json
+            - /mnt/data3/public_datasets/AIGC/GenImage/stable_diffusion_v_1_5_train.json
+            - /mnt/data3/public_datasets/AIGC/GenImage/VQDM_train.json
+            - /mnt/data3/public_datasets/AIGC/GenImage/wukong_train.json
+      - name: DocumentCrossDataset
+        pic_nums: 12641
+        init_config:
+          image_size: 256
+          path:
+            - /mnt/data1/public_datasets/Doc/DocTamperV1-TrainingSet_reset_to_realworld
+            - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/OSTF_train
+            - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/RealTextManipulation_train
+            - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/T-SROIE_train
+            - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/Tampered-IC13_train
+      - name: DeepfakeCrossDataset
+        pic_nums: 12641
+        init_config:
+          image_size: 256
+          path: /mnt/data1/public_datasets/Deepfake
+          config_file: /mnt/data1/public_datasets/Deepfake/FaceForensics++.json
+
+#  Test dataset (one or many)
+test_dataset:
+  - name: CrossDataset
+    dataset_name: CrossDataset
+    init_config:
+      dataset_config:
+        - name: IMDLCrossDataset
+          pic_nums: 500
+          init_config:
+            image_size: 256
+            path: /mnt/data0/public_datasets/IML/CASIAv2_with_label.json
+        - name: AIGCCrossDataset
+          pic_nums: 500
+          init_config:
+            image_size: 256
+            path:
+              - /mnt/data3/public_datasets/AIGC/GenImage/ADM_train.json
+              - /mnt/data3/public_datasets/AIGC/GenImage/BigGAN_train.json
+              - /mnt/data3/public_datasets/AIGC/GenImage/glide_train.json
+              - /mnt/data3/public_datasets/AIGC/GenImage/Midjourney_train.json
+              - /mnt/data3/public_datasets/AIGC/GenImage/stable_diffusion_v_1_4_train.json
+              - /mnt/data3/public_datasets/AIGC/GenImage/stable_diffusion_v_1_5_train.json
+              - /mnt/data3/public_datasets/AIGC/GenImage/VQDM_train.json
+              - /mnt/data3/public_datasets/AIGC/GenImage/wukong_train.json
+        - name: DocumentCrossDataset
+          pic_nums: 500
+          init_config:
+            image_size: 256
+            path:
+              - /mnt/data1/public_datasets/Doc/DocTamperV1-TrainingSet_reset_to_realworld
+              - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/OSTF_train
+              - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/RealTextManipulation_train
+              - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/T-SROIE_train
+              - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/Tampered-IC13_train
+        - name: DeepfakeCrossDataset
+          pic_nums: 500
+          init_config:
+            image_size: 256
+            path: /mnt/data1/public_datasets/Deepfake
+            config_file: /mnt/data1/public_datasets/Deepfake/FaceForensics++.json
+
+# Transform
+transform:
+  name: AIGCTransform
+
+# Evaluators
+evaluator:
+  - name: ImageF1
+    init_config:
+      threshold: 0.5
+
+# Training related
+batch_size: 320
+test_batch_size: 128
+epochs: 20
+accum_iter: 1
+record_epoch: 0  # Save the best only after record epoch.
+
+# Test related
+no_model_eval: false
+test_period: 1
+
+# Logging & TensorBoard
+log_per_epoch_count: 20
+
+# DDP & AMP settings
+find_unused_parameters: true
+use_amp: true
+
+# Optimizer parameters
+weight_decay: 0.05
+lr: 1e-4
+blr: 0.001
+min_lr: 1e-5
+warmup_epochs: 1
+
+# Device and training control
+device: "cuda"
+seed: 42
+resume: ""
+start_epoch: 0
+num_workers: 8
+pin_mem: true
+
+# Distributed training parameters
+world_size: 1
+local_rank: -1
+dist_on_itp: false
+dist_url: "env://"
+

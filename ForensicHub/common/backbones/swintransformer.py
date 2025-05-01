@@ -15,25 +15,25 @@ from IMDLBenCo.modules.extractors.sobel import SobelFilter
 from IMDLBenCo.modules.extractors.bayar_conv import BayerConv
 
 
-class Resnet(BaseModel):
+class SwinTransformer(BaseModel):
     def __init__(self,
                  input_head=None,
-                 output_type='label',  # label or mask
-                 backbone='resnet101',  # resnet50, reset101 or reset152
-                 pretrained=True,  # if true, use imagenet-1k pretrained weight
-                 image_size=256,  # to set mask size when output_type is mask
+                 output_type='label',  # 'label' or 'mask'
+                 backbone='swin_base_patch4_window7_224',
+                 pretrained=True,
+                 image_size=256,
                  num_channels=3):
-        super(Resnet, self).__init__()
-        assert backbone in ['resnet50', 'resnet101', 'resnet152'], "Only resnet50, reset101 or reset152 are supported"
-        self.model = timm.create_model(backbone, pretrained=pretrained)
+        super(SwinTransformer, self).__init__()
+
+        self.model = timm.create_model(backbone, pretrained=pretrained, img_size=image_size)
+
         self.backbone = self.model.forward_features
         out_channels = self.model.num_features
-        self.head = None
         self.output_type = output_type
 
         if output_type == 'label':
             self.head = nn.Sequential(
-                nn.AdaptiveMaxPool2d(1),
+                nn.AdaptiveAvgPool2d(1),
                 nn.Flatten(),
                 nn.Linear(out_channels, 1)
             )
@@ -49,9 +49,10 @@ class Resnet(BaseModel):
         else:
             raise ValueError(f"Unsupported output_type: {output_type}")
 
-        original_first_layer = list(self.model.children())[0]
+        # Extend input channels if input_head is used
         if input_head is not None:
             self.input_head = input_head
+            original_first_layer = self.model.patch_embed.proj
             new_first_layer = nn.Conv2d(num_channels + 3, original_first_layer.out_channels,
                                         kernel_size=original_first_layer.kernel_size,
                                         stride=original_first_layer.stride,
@@ -60,7 +61,7 @@ class Resnet(BaseModel):
             if num_channels > 0:
                 new_first_layer.weight.data[:, 3:, :, :] = torch.nn.init.kaiming_normal_(
                     new_first_layer.weight[:, 3:, :, :])
-            self.model.conv1 = new_first_layer
+            self.model.patch_embed.proj = new_first_layer
         else:
             self.input_head = None
 
@@ -70,7 +71,9 @@ class Resnet(BaseModel):
             x = torch.cat([image, feature], dim=1)
         else:
             x = image
-        out = self.head(self.backbone(x))
+        x = self.backbone(x)
+        x = x.permute(0, 3, 1, 2)
+        out = self.head(x)
 
         if self.output_type == 'label':
             if len(out.shape) == 2:
@@ -80,7 +83,8 @@ class Resnet(BaseModel):
         else:
             loss = F.binary_cross_entropy_with_logits(out, kwargs['mask'].float())
             pred = out.sigmoid()
-        out_dict = {
+
+        return {
             "backward_loss": loss,
             f"pred_{self.output_type}": pred,
             "visual_loss": {
@@ -88,55 +92,42 @@ class Resnet(BaseModel):
             }
         }
 
-        return out_dict
 
-
-@register_model("Resnet50")
-class Resnet50(Resnet):
+@register_model("SwinSmall")
+class SwinSmall(SwinTransformer):
     def __init__(self, output_type='label', pretrained=True, image_size=256):
-        super().__init__(input_head=None, output_type=output_type, backbone='resnet50', pretrained=pretrained,
+        super().__init__(input_head=None, output_type=output_type,
+                         backbone='swin_small_patch4_window7_224', pretrained=pretrained,
                          image_size=image_size, num_channels=0)
 
 
-@register_model("Resnet101")
-class Resnet101(Resnet):
+@register_model("SobelSwinSmall")
+class SobelSwinSmall(SwinTransformer):
     def __init__(self, output_type='label', pretrained=True, image_size=256):
-        super().__init__(input_head=None, output_type=output_type, backbone='resnet101', pretrained=pretrained,
-                         image_size=image_size, num_channels=0)
-
-
-@register_model("Resnet152")
-class Resnet152(Resnet):
-    def __init__(self, output_type='label', pretrained=True, image_size=256):
-        super().__init__(input_head=None, output_type=output_type, backbone='resnet152', pretrained=pretrained,
-                         image_size=image_size, num_channels=0)
-
-
-@register_model("SobelResnet101")
-class SobelResnet101(Resnet):
-    def __init__(self, output_type='label', pretrained=True, image_size=256):
-        super().__init__(input_head=SobelFilter(), output_type=output_type, backbone='resnet101', pretrained=pretrained,
+        super().__init__(input_head=SobelFilter(), output_type=output_type,
+                         backbone='swin_small_patch4_window7_224', pretrained=pretrained,
                          image_size=image_size, num_channels=1)
 
 
-@register_model("BayerResnet101")
-class BayerResnet101(Resnet):
+@register_model("BayerSwinSmall")
+class BayerSwinSmall(SwinTransformer):
     def __init__(self, output_type='label', pretrained=True, image_size=256):
-        super().__init__(input_head=BayerConv(), output_type=output_type, backbone='resnet101', pretrained=pretrained,
+        super().__init__(input_head=BayerConv(), output_type=output_type,
+                         backbone='swin_small_patch4_window7_224', pretrained=pretrained,
                          image_size=image_size, num_channels=3)
 
 
-@register_model("FFTResnet101")
-class FFTResnet101(Resnet):
+@register_model("FFTSwinSmall")
+class FFTSwinSmall(SwinTransformer):
     def __init__(self, output_type='label', pretrained=True, image_size=256):
-        super().__init__(input_head=FFTExtractor(), output_type=output_type, backbone='resnet101',
-                         pretrained=pretrained,
+        super().__init__(input_head=FFTExtractor(), output_type=output_type,
+                         backbone='swin_small_patch4_window7_224', pretrained=pretrained,
                          image_size=image_size, num_channels=3)
 
 
-@register_model("DCTResnet101")
-class DCTResnet101(Resnet):
+@register_model("DCTSwinSmall")
+class DCTSwinSmall(SwinTransformer):
     def __init__(self, output_type='label', pretrained=True, image_size=256):
-        super().__init__(input_head=DCTExtractor(), output_type=output_type, backbone='resnet101',
-                         pretrained=pretrained,
+        super().__init__(input_head=DCTExtractor(), output_type=output_type,
+                         backbone='swin_small_patch4_window7_224', pretrained=pretrained,
                          image_size=image_size, num_channels=3)

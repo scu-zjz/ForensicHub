@@ -1,1 +1,2 @@
 from .label_dataset import AIGCLabelDataset
+from .aigccrossdataset import AIGCCrossDataset

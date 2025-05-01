@@ -6,21 +6,21 @@ from ForensicHub.registry import register_dataset, build_from_registry, DATASETS
 @register_dataset("CrossDataset")
 class CrossDataset(BaseDataset):
     def __init__(self, dataset_config=[], **kwargs):
+        super().__init__(path='', **kwargs)
         self.datasets = []
         self.pic_nums = []
         self.dataset_names = []
         self.return_mask = True
         for config in dataset_config:
-            config['common_transform'] = self.common_transform
-            config['post_transform'] = self.post_transform
-            config['post_funcs'] = self.post_funcs
+            config['init_config']['common_transform'] = self.common_transform
+            config['init_config']['post_transform'] = self.post_transform
+            config['init_config']['post_funcs'] = self.post_funcs
             dataset = build_from_registry(DATASETS, config)
             self.dataset_names.append(config['name'])
             self.datasets.append(dataset)
-            self.pic_nums.append(dataset.pic_num)
+            self.pic_nums.append(config['pic_nums'])
             # if any dataset doesn't return mask, CrossDataset will not return mask
             self.return_mask = self.return_mask and self._check_has_mask(dataset)
-        super().__init__(path='', **kwargs)
 
     def __len__(self):
         total_samples = sum(self.pic_nums)  # 每个数据集的 pic_num 加起来
@@ -54,7 +54,7 @@ class CrossDataset(BaseDataset):
                 origin_out_dict = selected_dataset[selected_item]
                 out_dict = {
                     'image': origin_out_dict['image'],
-                    'label': origin_out_dict['label'],
+                    'label': origin_out_dict['label'].long(),
                 }
                 if self.return_mask and origin_out_dict.get('mask') is not None:
                     out_dict['mask'] = origin_out_dict['mask']
@@ -65,7 +65,8 @@ class CrossDataset(BaseDataset):
     def __str__(self):
         # 打印 CrossDataset 信息
         info = f"<===CrossDataset with {len(self.datasets)} datasets: {str(self.dataset_names)}===>\n"
-
+        for i, ds in enumerate(self.datasets):
+            info += f"  └─ Dataset {i}: {len(ds):,} samples, random sample: {self.pic_nums[i]}\n"
         info += f"Total samples per epoch: {self.__len__():,}\n"
         info += f"<================================================>\n"
         return info

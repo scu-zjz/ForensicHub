@@ -84,6 +84,7 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
 
     print(f"Train dataset: {train_dataset_args['dataset_name']}.")
     print(len(train_dataset))
+    print(str(train_dataset))
     print(f"Test dataset: {[args['dataset_name'] for args in test_dataset_args]}.")
     print([len(dataset) for dataset in test_dataset_list.values()])
 

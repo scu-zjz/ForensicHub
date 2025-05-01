@@ -15,25 +15,26 @@ from IMDLBenCo.modules.extractors.sobel import SobelFilter
 from IMDLBenCo.modules.extractors.bayar_conv import BayerConv
 
 
-class Resnet(BaseModel):
+class ConvNext(BaseModel):
     def __init__(self,
                  input_head=None,
-                 output_type='label',  # label or mask
-                 backbone='resnet101',  # resnet50, reset101 or reset152
-                 pretrained=True,  # if true, use imagenet-1k pretrained weight
-                 image_size=256,  # to set mask size when output_type is mask
+                 output_type='label',
+                 backbone='convnext_base',  # 可以改为 tiny/small/large/xlarge
+                 pretrained=True,
+                 image_size=256,
                  num_channels=3):
-        super(Resnet, self).__init__()
-        assert backbone in ['resnet50', 'resnet101', 'resnet152'], "Only resnet50, reset101 or reset152 are supported"
-        self.model = timm.create_model(backbone, pretrained=pretrained)
+        super(ConvNext, self).__init__()
+
+        assert 'convnext' in backbone, "Backbone must be one of timm ConvNext variants"
+
+        self.model = timm.create_model(backbone, pretrained=pretrained, features_only=False)
         self.backbone = self.model.forward_features
         out_channels = self.model.num_features
-        self.head = None
         self.output_type = output_type
 
         if output_type == 'label':
             self.head = nn.Sequential(
-                nn.AdaptiveMaxPool2d(1),
+                nn.AdaptiveAvgPool2d(1),
                 nn.Flatten(),
                 nn.Linear(out_channels, 1)
             )
@@ -49,20 +50,20 @@ class Resnet(BaseModel):
         else:
             raise ValueError(f"Unsupported output_type: {output_type}")
 
-        original_first_layer = list(self.model.children())[0]
+        self.input_head = input_head
         if input_head is not None:
-            self.input_head = input_head
-            new_first_layer = nn.Conv2d(num_channels + 3, original_first_layer.out_channels,
-                                        kernel_size=original_first_layer.kernel_size,
-                                        stride=original_first_layer.stride,
-                                        padding=original_first_layer.padding, bias=False)
-            new_first_layer.weight.data[:, :3, :, :] = original_first_layer.weight.data.clone()[:, :3, :, :]
+            first_conv = self.model.stem[0]  # ConvNext 通常第一层在 stem[0]
+            new_conv = nn.Conv2d(num_channels + 3,
+                                 first_conv.out_channels,
+                                 kernel_size=first_conv.kernel_size,
+                                 stride=first_conv.stride,
+                                 padding=first_conv.padding,
+                                 bias=False)
+            new_conv.weight.data[:, :3, :, :] = first_conv.weight.data.clone()[:, :3, :, :]
             if num_channels > 0:
-                new_first_layer.weight.data[:, 3:, :, :] = torch.nn.init.kaiming_normal_(
-                    new_first_layer.weight[:, 3:, :, :])
-            self.model.conv1 = new_first_layer
-        else:
-            self.input_head = None
+                new_conv.weight.data[:, 3:, :, :] = torch.nn.init.kaiming_normal_(
+                    new_conv.weight[:, 3:, :, :])
+            self.model.stem[0] = new_conv
 
     def forward(self, image, *args, **kwargs):
         if self.input_head is not None:
@@ -70,6 +71,7 @@ class Resnet(BaseModel):
             x = torch.cat([image, feature], dim=1)
         else:
             x = image
+
         out = self.head(self.backbone(x))
 
         if self.output_type == 'label':
@@ -80,6 +82,7 @@ class Resnet(BaseModel):
         else:
             loss = F.binary_cross_entropy_with_logits(out, kwargs['mask'].float())
             pred = out.sigmoid()
+
         out_dict = {
             "backward_loss": loss,
             f"pred_{self.output_type}": pred,
@@ -87,56 +90,44 @@ class Resnet(BaseModel):
                 "combined_loss": loss
             }
         }
-
         return out_dict
 
 
-@register_model("Resnet50")
-class Resnet50(Resnet):
+@register_model("ConvNextSmall")
+class ConvNextSmall(ConvNext):
     def __init__(self, output_type='label', pretrained=True, image_size=256):
-        super().__init__(input_head=None, output_type=output_type, backbone='resnet50', pretrained=pretrained,
+        super().__init__(input_head=None, output_type=output_type,
+                         backbone='convnext_small', pretrained=pretrained,
                          image_size=image_size, num_channels=0)
 
 
-@register_model("Resnet101")
-class Resnet101(Resnet):
+@register_model("SobelConvNextSmall")
+class SobelConvNextSmall(ConvNext):
     def __init__(self, output_type='label', pretrained=True, image_size=256):
-        super().__init__(input_head=None, output_type=output_type, backbone='resnet101', pretrained=pretrained,
-                         image_size=image_size, num_channels=0)
-
-
-@register_model("Resnet152")
-class Resnet152(Resnet):
-    def __init__(self, output_type='label', pretrained=True, image_size=256):
-        super().__init__(input_head=None, output_type=output_type, backbone='resnet152', pretrained=pretrained,
-                         image_size=image_size, num_channels=0)
-
-
-@register_model("SobelResnet101")
-class SobelResnet101(Resnet):
-    def __init__(self, output_type='label', pretrained=True, image_size=256):
-        super().__init__(input_head=SobelFilter(), output_type=output_type, backbone='resnet101', pretrained=pretrained,
+        super().__init__(input_head=SobelFilter(), output_type=output_type,
+                         backbone='convnext_small', pretrained=pretrained,
                          image_size=image_size, num_channels=1)
 
 
-@register_model("BayerResnet101")
-class BayerResnet101(Resnet):
+@register_model("BayerConvNextSmall")
+class BayerConvNextSmall(ConvNext):
     def __init__(self, output_type='label', pretrained=True, image_size=256):
-        super().__init__(input_head=BayerConv(), output_type=output_type, backbone='resnet101', pretrained=pretrained,
+        super().__init__(input_head=BayerConv(), output_type=output_type,
+                         backbone='convnext_small', pretrained=pretrained,
                          image_size=image_size, num_channels=3)
 
 
-@register_model("FFTResnet101")
-class FFTResnet101(Resnet):
+@register_model("FFTConvNextSmall")
+class FFTConvNextSmall(ConvNext):
     def __init__(self, output_type='label', pretrained=True, image_size=256):
-        super().__init__(input_head=FFTExtractor(), output_type=output_type, backbone='resnet101',
-                         pretrained=pretrained,
+        super().__init__(input_head=FFTExtractor(), output_type=output_type,
+                         backbone='convnext_small', pretrained=pretrained,
                          image_size=image_size, num_channels=3)
 
 
-@register_model("DCTResnet101")
-class DCTResnet101(Resnet):
+@register_model("DCTConvNextSmall")
+class DCTConvNextSmall(ConvNext):
     def __init__(self, output_type='label', pretrained=True, image_size=256):
-        super().__init__(input_head=DCTExtractor(), output_type=output_type, backbone='resnet101',
-                         pretrained=pretrained,
+        super().__init__(input_head=DCTExtractor(), output_type=output_type,
+                         backbone='convnext_small', pretrained=pretrained,
                          image_size=image_size, num_channels=3)

@@ -4,12 +4,11 @@ import random
 import torch
 import numpy as np
 from PIL import Image
-from ForensicHub.core.cross_dataset import BaseCrossDataset
 from ForensicHub.core.base_dataset import BaseDataset
 from ForensicHub.registry import register_dataset
 
 
-# @register_dataset("DeepfakeCrossDataset")
+@register_dataset("DeepfakeCrossDataset")
 class DeepfakeCrossDataset(BaseDataset):
     def __init__(self, path, config_file, compression='c23', image_size=256, split_mode='train', **kwargs):
         """
@@ -25,7 +24,6 @@ class DeepfakeCrossDataset(BaseDataset):
         self.image_size = image_size
         self.split_mode = split_mode.lower()
         super().__init__(path=path, **kwargs)
-
 
     def _init_dataset_path(self):
         """从配置文件中读取图像路径和标签，支持 train/test 分支。"""
@@ -59,7 +57,6 @@ class DeepfakeCrossDataset(BaseDataset):
     def __len__(self):
         return len(self.samples)
 
-
     def __getitem__(self, idx):
         sample = self.samples[idx]
         image_path = sample["path"]
@@ -70,7 +67,7 @@ class DeepfakeCrossDataset(BaseDataset):
         image = np.array(image)
 
         mask = None  # 此任务中 mask 可为空
-        
+
         if self.common_transform:
             out = self.common_transform(image=image)
             image = out['image']
@@ -84,11 +81,15 @@ class DeepfakeCrossDataset(BaseDataset):
             "label": torch.tensor(label).long()
         }
 
+
 if __name__ == '__main__':
-    dataset = DeepfakeCrossDataset(path='/mnt/data1/public_datasets/Deepfake', config_file='/mnt/data1/public_datasets/Deepfake/FaceForensics++.json')
+    dataset = DeepfakeCrossDataset(path='/mnt/data1/public_datasets/Deepfake',
+                                   config_file='/mnt/data1/public_datasets/Deepfake/FaceForensics++.json')
 
     dataset.__getitem__(0)
-    import pdb;pdb.set_trace()
+    import pdb;
+
+    pdb.set_trace()
     # path不变  唯一要变的是config_file  c40那个数据集compression变成'c40' 前面是名字 以及split_mode变为train或者test
     # 训练:FaceForensics++ /mnt/data1/public_datasets/Deepfake/FaceForensics++.json compression='c23'
     # 测试: 1. FaceForensics++  /mnt/data1/public_datasets/Deepfake/FaceForensics++.json
