@@ -3,7 +3,7 @@ gpus: "2,3"
 flag: train
 
 # Log
-log_dir: "./log/crossdataset_image/crossdataset_dctresnet101_train"
+log_dir: "./log/crossdataset_image/crossdataset_resnet101_dct_train"
 
 # Task
 if_predict_label: true

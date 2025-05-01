@@ -54,17 +54,25 @@ class ImageAP(AbstractEvaluator):
         self.remain_label.append(label)
 
     def epoch_update(self):
-        predict = torch.cat(self.predict, dim=0)
-        label = torch.cat(self.label, dim=0)
-        gather_predict = [torch.zeros_like(predict) for _ in range(self.world_size)]
-        gather_label = [torch.zeros_like(label) for _ in range(self.world_size)]
-        dist.all_gather(gather_predict, predict)
-        dist.all_gather(gather_label, label)
-        gather_predict = torch.cat(gather_predict, dim=0)
-        gather_label = torch.cat(gather_label, dim=0)
-        if self.remain_predict:
-            gather_predict = torch.cat([gather_predict, torch.cat(self.remain_predict, dim=0)], dim=0)
-            gather_label = torch.cat([gather_label, torch.cat(self.remain_label, dim=0)], dim=0)
+        if len(self.predict) != 0:
+            predict = torch.cat(self.predict, dim=0)
+            label = torch.cat(self.label, dim=0)
+            gather_predict_list = [torch.zeros_like(predict) for _ in range(self.world_size)]
+            gather_label_list = [torch.zeros_like(label) for _ in range(self.world_size)]
+            dist.all_gather(gather_predict_list, predict)
+            dist.all_gather(gather_label_list, label)
+            gather_predict = torch.cat(gather_predict_list, dim=0)
+            gather_label = torch.cat(gather_label_list, dim=0)
+            if len(self.remain_predict) != 0:
+                self.remain_predict = torch.cat(self.remain_predict, dim=0)
+                self.remain_label = torch.cat(self.remain_label, dim=0)
+                gather_predict = torch.cat([gather_predict, self.remain_predict], dim=0)
+                gather_label = torch.cat([gather_label, self.remain_label], dim=0)
+        else:
+            if len(self.remain_predict) == 0:
+                raise RuntimeError(f"No data to calculate {self.name}, please check the input data.")
+            gather_predict = torch.cat(self.remain_predict, dim=0)
+            gather_label = torch.cat(self.remain_label, dim=0)
         ap = average_precision_gpu(gather_label, gather_predict)
         return ap
 

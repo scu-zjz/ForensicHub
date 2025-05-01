@@ -74,6 +74,6 @@ class BaseDataset(Dataset, ABC):
     def __str__(self) -> str:
         """Return string representation of the dataset."""
         cls_name = self.__class__.__name__
-        cls_path = self.entry_path
+        cls_path = self.path
         cls_len = len(self)
         return f"[{cls_name}] at {cls_path}, with length of {cls_len:,}"
