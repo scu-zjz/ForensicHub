@@ -8,7 +8,7 @@ from ForensicHub.core.base_dataset import BaseDataset
 from ForensicHub.registry import register_dataset
 
 
-@register_dataset("DeepfakeCrossDataset")
+# @register_dataset("DeepfakeCrossDataset")
 class DeepfakeCrossDataset(BaseDataset):
     def __init__(self, path, config_file, compression='c23', image_size=256, split_mode='train', **kwargs):
         """
@@ -25,8 +25,9 @@ class DeepfakeCrossDataset(BaseDataset):
         self.split_mode = split_mode.lower()
         super().__init__(path=path, **kwargs)
 
+
     def _init_dataset_path(self):
-        """从配置文件中读取图像路径和标签，支持 train/test 分支。"""
+        """从配置文件中读取图像路径和标签，支持 train/test 分支，压缩率字段可选。"""
         with open(self.config_file, 'r') as f:
             dataset_info = json.load(f)
 
@@ -38,11 +39,15 @@ class DeepfakeCrossDataset(BaseDataset):
 
                 if self.split_mode not in splits:
                     continue
-                if self.compression not in splits[self.split_mode]:
-                    continue
+                # 如果有压缩率字段就使用，没有就直接取该分支
+                if isinstance(splits[self.split_mode], dict) and self.compression in splits[self.split_mode]:
+                    video_group = splits[self.split_mode][self.compression]
+                elif isinstance(splits[self.split_mode], dict):
+                    video_group = splits[self.split_mode]
+                else:
+                    continue  # 无法匹配则跳过
 
-                videos = splits[self.split_mode][self.compression]
-                for video_id, video_info in videos.items():
+                for video_id, video_info in video_group.items():
                     frame_paths = video_info["frames"]
                     for rel_path in frame_paths:
                         full_path = os.path.join(self.path, rel_path)
@@ -54,8 +59,10 @@ class DeepfakeCrossDataset(BaseDataset):
 
         self.samples = samples
 
+
     def __len__(self):
         return len(self.samples)
+
 
     def __getitem__(self, idx):
         sample = self.samples[idx]
@@ -67,7 +74,7 @@ class DeepfakeCrossDataset(BaseDataset):
         image = np.array(image)
 
         mask = None  # 此任务中 mask 可为空
-
+        
         if self.common_transform:
             out = self.common_transform(image=image)
             image = out['image']
@@ -81,15 +88,12 @@ class DeepfakeCrossDataset(BaseDataset):
             "label": torch.tensor(label).long()
         }
 
-
 if __name__ == '__main__':
-    dataset = DeepfakeCrossDataset(path='/mnt/data1/public_datasets/Deepfake',
-                                   config_file='/mnt/data1/public_datasets/Deepfake/FaceForensics++.json')
+    dataset = DeepfakeCrossDataset(path='/mnt/data1/public_datasets/Deepfake', config_file='/mnt/data1/public_datasets/Deepfake/UADFV.json',split_mode='test')
 
     dataset.__getitem__(0)
-    import pdb;
-
-    pdb.set_trace()
+    
+    import pdb;pdb.set_trace()
     # path不变  唯一要变的是config_file  c40那个数据集compression变成'c40' 前面是名字 以及split_mode变为train或者test
     # 训练:FaceForensics++ /mnt/data1/public_datasets/Deepfake/FaceForensics++.json compression='c23'
     # 测试: 1. FaceForensics++  /mnt/data1/public_datasets/Deepfake/FaceForensics++.json
