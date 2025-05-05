@@ -165,6 +165,8 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
     print("accumulate grad iterations: %d" % args.accum_iter)
     print("effective batch size: %d" % eff_batch_size)
 
+    print(f"master port: {os.environ['MASTER_PORT']}")
+
     if args.distributed:
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu],
                                                           find_unused_parameters=args.find_unused_parameters)

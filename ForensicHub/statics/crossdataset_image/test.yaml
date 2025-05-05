@@ -1,5 +1,5 @@
 # DDP
-gpus: "4,5"
+gpus: "0,1,2,3"
 flag: test
 
 # Log
@@ -59,6 +59,16 @@ test_dataset:
       # Dataset specific setting
       is_resizing: true
       is_padding: false
+  - name: AIGCLabelDataset
+    dataset_name: Cocoglide
+    init_config:
+      image_size: 256
+      path: /mnt/data0/public_datasets/IML/CocoGlide/dataset.json
+  - name: AIGCLabelDataset
+    dataset_name: Autosplice
+    init_config:
+      image_size: 256
+      path: /mnt/data0/public_datasets/IML/Autosplice/AutoSplice/label.json
   # AIGC
   - name: AIGCLabelDataset
     dataset_name: DiffusionForensics_test
@@ -157,12 +167,12 @@ test_dataset:
       image_size: 256
       path:
         - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/RealTextManipulation_test
-  - name: DocumentCrossDataset
-    dataset_name: T-SROIE_test
-    init_config:
-      image_size: 256
-      path:
-        - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/T-SROIE_test
+#  - name: DocumentCrossDataset
+#    dataset_name: T-SROIE_test
+#    init_config:
+#      image_size: 256
+#      path:
+#        - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/T-SROIE_test
   - name: DocumentCrossDataset
     dataset_name: Tampered-IC13_test
     init_config:
@@ -265,7 +275,7 @@ evaluator:
   - name: ImageTPR
   - name: ImageAccuracy
 
-test_batch_size: 128
+test_batch_size: 32
 
 # Device
 device: "cuda"

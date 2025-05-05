@@ -90,6 +90,10 @@ class DocumentCrossDataset(BaseDataset):
             "label": torch.tensor(1).long() if torch.sum(mask) > 0 else torch.tensor(0).long()
         }
 
+        # Apply post-processing functions
+        if self.post_funcs:
+            self.post_funcs(output)
+
         return output
 
 

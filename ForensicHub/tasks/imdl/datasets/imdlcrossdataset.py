@@ -62,4 +62,8 @@ class IMDLCrossDataset(BaseDataset):
             "label": torch.tensor(label).long()
         }
 
+        # Apply post-processing functions
+        if self.post_funcs:
+            self.post_funcs(output)
+
         return output

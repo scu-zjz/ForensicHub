@@ -24,6 +24,7 @@ class Mask2LabelWrapper(BaseModel):
     def forward(self, image, label, *args, **kwargs):
         mask = torch.randint(0, 1, (image.shape[0], 1, image.shape[2], image.shape[3])).long().to(image.device)
         edge_mask = torch.randint(0, 1, (image.shape[0], 1, image.shape[2], image.shape[3])).long().to(image.device)
+        label = label.float()
         if self.name in ['IML_ViT', 'Mesorch', 'Cat_Net']:
             features = self.base_model.forward_features(image=image, mask=mask, edge_mask=edge_mask, label=label, *args,
                                                         **kwargs)
@@ -36,6 +37,11 @@ class Mask2LabelWrapper(BaseModel):
                 pred_label = pred_label.view(-1)
             loss = self.loss_fn(pred_label, label.float())
             pred_label = F.sigmoid(pred_label)
+        elif self.name in ['DTD', 'FFDN']:
+            out_dict = self.base_model(image=image, mask=mask, dct=kwargs['dct'], qt=kwargs['qt'])
+            pred_label = self.head(out_dict['pred_mask'][:, 0:1, :, :])
+            pred_label = pred_label.view(-1)
+            loss = F.binary_cross_entropy(pred_label, label)
         else:
             outputs = self.base_model(image=image, mask=mask, edge_mask=edge_mask, label=label, *args, **kwargs)
             pred_label = outputs['pred_label']

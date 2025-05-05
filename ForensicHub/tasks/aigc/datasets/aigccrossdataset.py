@@ -65,4 +65,8 @@ class AIGCCrossDataset(BaseDataset):
             "label": torch.tensor(label, dtype=torch.float)
         }
 
+        # Apply post-processing functions
+        if self.post_funcs:
+            self.post_funcs(output)
+
         return output

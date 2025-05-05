@@ -92,8 +92,8 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
             "post_transform": post_transform
         })
         test_dataset_list[test_args["dataset_name"]] = build_from_registry(DATASETS, test_args)
-    print(f"Test dataset: {[args['dataset_name'] for args in test_dataset_args]}.")
-    print([len(dataset) for dataset in test_dataset_list.values()])
+    for t_args, dataset in zip(test_dataset_args, test_dataset_list.values()):
+        print(f"Test dataset: {t_args['dataset_name']} (length: {len(dataset)})")
 
     # Start go through each datasets:
     for dataset_name, test_dataset in test_dataset_list.items():
@@ -105,9 +105,6 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
         else:
             log_writer = None
         dataset_logger[dataset_name] = log_writer
-
-        print(test_dataset)
-        print("len(test_dataset)", len(test_dataset))
 
         # Sampler
         if args.distributed:

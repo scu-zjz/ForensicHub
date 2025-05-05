@@ -433,8 +433,12 @@ class MID(nn.Module):
 
 @register_model("DTD")
 class DTD(BaseModel):
-    def __init__(self, decoder_channels=(384, 192, 96, 64), classes=2, use_dice_loss=False):
+    def __init__(self, decoder_channels=(384, 192, 96, 64), classes=2, use_dice_loss=False,
+                 convnext_path='/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/tasks/document/models/dtd/convnext_small.pth',
+                 swin_path='/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/tasks/document/models/dtd/swintransformerv2_small.pth'):
         super().__init__()
+        self.convnext_path = convnext_path
+        self.swin_path = swin_path
         self.vph = ConvNeXt(in_chans=6)  # Backbone1, using stage 0, 1
         self.swin = SwinTransformerV2()  # Backbone2, using stages 1, 2, 3
         self.fph = FPH()
@@ -451,7 +455,7 @@ class DTD(BaseModel):
             self.dice = SoftDiceLossV1()
 
     def init_vph(self, ):
-        weights = torch.load('convnext_small.pth')['state_dict']
+        weights = torch.load(self.convnext_path)['state_dict']
         weights['backbone.downsample_layers.0.0.weight'] = torch.cat(
             (weights['backbone.downsample_layers.0.0.weight'], weights['backbone.downsample_layers.0.0.weight']), 1)
         dels = [k for k in weights.keys() if not k.startswith('backbone.')]
@@ -467,7 +471,7 @@ class DTD(BaseModel):
         del self.vph.stages[2]
 
     def init_swin(self, ):
-        weights = torch.load('swintransformerv2_small.pth')['model']
+        weights = torch.load(self.swin_path)['model']
         self.swin.load_state_dict(weights)
         del self.swin.norm
         del self.swin.patch_embed
@@ -508,6 +512,8 @@ class DTD(BaseModel):
         x = image
         mask = mask.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]
         dct = dct.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]
+        if len(qt.shape) == 3:
+            qt = qt.unsqueeze(1)
         features = self.vph.forward_features(self.addcoords(x), end_index=2)
         features[1] = self.FU(torch.cat((features[1], self.fph(dct, qt)), 1))
         rst = self.swin.layers[0](features[1].flatten(2).transpose(1, 2).contiguous())
@@ -521,7 +527,7 @@ class DTD(BaseModel):
         seg_loss, output = self.cal_seg_loss(output, mask)
         output_dict = {
             "backward_loss": seg_loss,
-            "pred_mask": output,
+            "pred_mask": output.sigmoid(),
             "visual_loss": {
                 "seg_loss": seg_loss,
                 "combined_loss": seg_loss

@@ -19,8 +19,10 @@ class CrossDataset(BaseDataset):
             self.dataset_names.append(config['name'])
             self.datasets.append(dataset)
             self.pic_nums.append(config['pic_nums'])
-            # if any dataset doesn't return mask, CrossDataset will not return mask
-            self.return_mask = self.return_mask and self._check_has_mask(dataset)
+
+        # 数据集的最小keys集合
+        self.common_keys = self.get_common_keys(self.datasets)
+        print(self.common_keys)
 
     def __len__(self):
         total_samples = sum(self.pic_nums)  # 每个数据集的 pic_num 加起来
@@ -29,16 +31,19 @@ class CrossDataset(BaseDataset):
     def _init_dataset_path(self) -> None:
         pass
 
-    def _check_has_mask(self, dataset):
-        # 校验数据集是否包含 mask
+    def get_common_keys(self, datasets):
+        """
+        获取所有数据集样本中 key 的最小公共集合
+        """
         try:
-            # 尝试访问一个样本，如果样本中有 'mask'，返回 True，否则返回 False
-            sample = dataset[0]
-            if 'mask' in sample:
-                return True
+            # 初始化为第一个数据集的第一个样本的 key 集合
+            common_keys = set(datasets[0][0].keys())
+            for dataset in datasets[1:]:
+                sample = dataset[0]
+                common_keys &= set(sample.keys())
+            return common_keys
         except Exception as e:
-            pass  # 如果无法访问，或者没有 'mask'，则返回 False
-        return False
+            return set()  # 如果出错，返回空集合
 
     def __getitem__(self, index):
         # 根据 index 确定应该从哪个数据集抽取图像
@@ -52,13 +57,9 @@ class CrossDataset(BaseDataset):
                 # 在当前数据集中随机选择一个样本
                 selected_item = random.randint(0, len(selected_dataset) - 1)
                 origin_out_dict = selected_dataset[selected_item]
-                out_dict = {
-                    'image': origin_out_dict['image'],
-                    'label': origin_out_dict['label'].long(),
-                }
-                if self.return_mask and origin_out_dict.get('mask') is not None:
-                    out_dict['mask'] = origin_out_dict['mask']
-                return out_dict
+                origin_out_dict = {key: origin_out_dict[key] for key in self.common_keys if key in origin_out_dict}
+                origin_out_dict['label'] = origin_out_dict['label'].long()
+                return origin_out_dict
 
         raise IndexError("Index out of range")
 
