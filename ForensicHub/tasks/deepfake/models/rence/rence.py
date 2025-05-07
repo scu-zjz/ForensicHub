@@ -9,8 +9,6 @@ from ForensicHub.core.base_model import BaseModel
 from timm.models import xception
 from .xception import SeparableConv2d, Block
 
-logger = logging.getLogger(__name__)
-
 encoder_params = {
     "xception": {
         "features": 2048,
@@ -47,13 +45,13 @@ class RecceDetector(BaseModel):
         # 对提取的特征进行分类
         return self.model.classifier(features)
 
-
     def forward(self, image: torch.tensor, label: torch.tensor, **kwargs) -> dict:
         # 前向传播
+        label = label.long()
         features = self.features(image)
         pred = self.classifier(features)
         prob = torch.softmax(pred, dim=1)[:, 1]
-        
+
         # 计算损失
         loss = self.loss_func(pred, label)
 
@@ -66,6 +64,7 @@ class RecceDetector(BaseModel):
 
 class Recce(nn.Module):
     """ End-to-End Reconstruction-Classification Learning for Face Forgery Detection """
+
     def __init__(self, num_classes, drop_rate=0.2):
         super(Recce, self).__init__()
         self.encoder = encoder_params["xception"]["init_op"]()
@@ -102,11 +101,12 @@ class Recce(nn.Module):
             nn.Conv2d(64, 3, 1, 1, bias=False),
             nn.Tanh()
         )
+
     def norm_n_corr(self, x):
         norm_embed = F.normalize(self.global_pool(x), p=2, dim=1)
         corr = (torch.matmul(norm_embed.squeeze(), norm_embed.squeeze().T) + 1.) / 2.
         return norm_embed, corr
-    
+
     @staticmethod
     def add_white_noise(tensor, mean=0., std=1e-6):
         rand = torch.rand([tensor.shape[0], 1, 1, 1])
@@ -115,9 +115,9 @@ class Recce(nn.Module):
         noise_t = tensor + white_noise * rand
         noise_t = torch.clip(noise_t, -1., 1.)
         return noise_t
-    
+
     def features(self, x):
-                # clear the loss inputs
+        # clear the loss inputs
         self.loss_inputs = dict(recons=[], contra=[])
         noise_x = self.add_white_noise(x) if self.training else x
         out = self.encoder.conv1(noise_x)
@@ -185,7 +185,6 @@ class Recce(nn.Module):
 
     def forward(self, x):
         embedding, recons_x = self.features(x)
-        
 
         return self.classifier(embedding)
 

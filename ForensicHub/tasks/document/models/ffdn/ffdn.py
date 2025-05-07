@@ -439,6 +439,8 @@ class FFDN(BaseModel):
         x = image
         mask = mask.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]
         dct = dct.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]
+        if len(qt.shape) == 3:
+            qt = qt.unsqueeze(1)
         features = self.vph.forward_features(x, end_index=2)
         features[1] = self.FU(torch.cat((features[1], self.fph(dct, qt)), 1)) + features[1]
         features.extend(self.vph.forward_features(features[1], start_index=2, end_index=4))
@@ -447,7 +449,7 @@ class FFDN(BaseModel):
         seg_loss, output = self.cal_seg_loss(output, mask)
         output_dict = {
             "backward_loss": seg_loss,
-            "pred_mask": output,
+            "pred_mask": output.sigmoid(),
             "visual_loss": {
                 "seg_loss": seg_loss,
                 "combined_loss": seg_loss

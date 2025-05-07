@@ -7,17 +7,16 @@ from ForensicHub.core.base_model import BaseModel
 import torchvision.models as models
 import yaml
 
-logger = logging.getLogger(__name__)
 
 @register_model("Capsule_net")
 class CapsuleNet(BaseModel):
     def __init__(self, yaml_config_path):
         super(CapsuleNet, self).__init__()
-        
+
         # 从 YAML 配置文件读取配置
         with open(yaml_config_path, 'r') as file:
             config = yaml.safe_load(file)
-        
+
         # 配置中的类数量
         self.num_classes = config['num_classes']
 
@@ -79,15 +78,16 @@ class CapsuleNet(BaseModel):
         Returns:
             dict: Dictionary containing the backward loss and predictions.
         """
+        label = label.long()
         # Extract features from the input image
         features = self.features(image)
-        
+
         # Get the prediction by classifier
         preds, pred = self.classifier(features)
-        
+
         # Get the probability of the pred
         prob = torch.softmax(pred, dim=1)[:, 1]
-        
+
         # Compute the loss using the ground truth labels
         loss = self.loss_func(preds, label)
 
@@ -98,7 +98,6 @@ class CapsuleNet(BaseModel):
             "visual_loss": {"combined_loss": loss}
         }
 
-
     def weights_init(self, m):
         classname = m.__class__.__name__
         if classname.find('Conv') != -1:
@@ -106,6 +105,7 @@ class CapsuleNet(BaseModel):
         elif classname.find('BatchNorm') != -1:
             m.weight.data.normal_(1.0, 0.02)
             m.bias.data.fill_(0)
+
 
 # VGG input(10,3,256,256)
 class VggExtractor(nn.Module):
@@ -119,15 +119,16 @@ class VggExtractor(nn.Module):
             self.vgg_1.eval()
 
     def Vgg(self, vgg, begin, end):
-        features = nn.Sequential(*list(vgg.features.children())[begin:(end+1)])
+        features = nn.Sequential(*list(vgg.features.children())[begin:(end + 1)])
         return features
 
     def freeze_gradient(self, begin=0, end=9):
-        for i in range(begin, end+1):
+        for i in range(begin, end + 1):
             self.vgg_1[i].requires_grad = False
 
     def forward(self, input):
         return self.vgg_1(input)
+
 
 class FeatureExtractor(nn.Module):
     def __init__(self):
@@ -158,15 +159,17 @@ class FeatureExtractor(nn.Module):
         output = torch.stack(outputs, dim=-1)
         return self.squash(output, dim=-1)
 
+
 class StatsNet(nn.Module):
     def __init__(self):
         super(StatsNet, self).__init__()
 
     def forward(self, x):
-        x = x.view(x.data.shape[0], x.data.shape[1], x.data.shape[2]*x.data.shape[3])
+        x = x.view(x.data.shape[0], x.data.shape[1], x.data.shape[2] * x.data.shape[3])
         mean = torch.mean(x, 2)
         std = torch.std(x, 2)
         return torch.stack((mean, std), dim=1)
+
 
 class View(nn.Module):
     def __init__(self, *shape):
@@ -175,6 +178,7 @@ class View(nn.Module):
 
     def forward(self, input):
         return input.view(self.shape)
+
 
 # Capsule right Dynamic routing
 class RoutingLayer(nn.Module):
@@ -214,6 +218,7 @@ class RoutingLayer(nn.Module):
         else:
             outputs = outputs.unsqueeze_(dim=0).transpose(2, 1).contiguous()
         return outputs
+
 
 # Loss Function: CapsuleLoss
 class CapsuleLoss(nn.Module):

@@ -8,21 +8,20 @@ from ForensicHub.registry import register_model
 from ForensicHub.core.base_model import BaseModel
 from timm.models import xception
 
-logger = logging.getLogger(__name__)
 
 @register_model("Spsl")
 class Spsl(BaseModel):
-    def __init__(self,yaml_config_path=None):
+    def __init__(self, yaml_config_path=None):
         super(Spsl, self).__init__()
         with open(yaml_config_path, 'r') as f:
             self.config = yaml.safe_load(f)
-        import pdb;pdb.set_trace()
         # 构建模型和损失函数
         self.backbone = self.build_backbone()
         self.loss_func = self.build_loss()
 
     def build_backbone(self):
-        return xception(num_classes = self.config['backbone_config']['num_classes'],in_chans=self.config['backbone_config']['inc'] , pretrained=True)
+        return xception(num_classes=self.config['backbone_config']['num_classes'],
+                        in_chans=self.config['backbone_config']['inc'], pretrained=True)
 
     def build_loss(self):
         # 固定为 CrossEntropyLoss

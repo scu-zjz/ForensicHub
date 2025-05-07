@@ -25,12 +25,12 @@ train_dataset:
       - name: IMDLCrossDataset
         pic_nums: 12641
         init_config:
-          image_size: 256
+          image_size: 512
           path: /mnt/data0/public_datasets/IML/CASIAv2_with_label.json
       - name: AIGCCrossDataset
         pic_nums: 12641
         init_config:
-          image_size: 256
+          image_size: 512
           path:
             - /mnt/data3/public_datasets/AIGC/GenImage/ADM_train.json
             - /mnt/data3/public_datasets/AIGC/GenImage/BigGAN_train.json
@@ -43,7 +43,7 @@ train_dataset:
       - name: DocumentCrossDataset
         pic_nums: 12641
         init_config:
-          image_size: 256
+          image_size: 512
           path:
             - /mnt/data1/public_datasets/Doc/DocTamperV1-TrainingSet_reset_to_realworld
             - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/OSTF_train
@@ -53,7 +53,7 @@ train_dataset:
       - name: DeepfakeCrossDataset
         pic_nums: 12641
         init_config:
-          image_size: 256
+          image_size: 512
           path: /mnt/data1/public_datasets/Deepfake
           config_file: /mnt/data1/public_datasets/Deepfake/FaceForensics++.json
 
@@ -66,12 +66,12 @@ test_dataset:
         - name: IMDLCrossDataset
           pic_nums: 500
           init_config:
-            image_size: 256
+            image_size: 512
             path: /mnt/data0/public_datasets/IML/CASIAv2_with_label.json
         - name: AIGCCrossDataset
           pic_nums: 500
           init_config:
-            image_size: 256
+            image_size: 512
             path:
               - /mnt/data3/public_datasets/AIGC/GenImage/ADM_train.json
               - /mnt/data3/public_datasets/AIGC/GenImage/BigGAN_train.json
@@ -84,7 +84,7 @@ test_dataset:
         - name: DocumentCrossDataset
           pic_nums: 500
           init_config:
-            image_size: 256
+            image_size: 512
             path:
               - /mnt/data1/public_datasets/Doc/DocTamperV1-TrainingSet_reset_to_realworld
               - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/OSTF_train
@@ -94,7 +94,7 @@ test_dataset:
         - name: DeepfakeCrossDataset
           pic_nums: 500
           init_config:
-            image_size: 256
+            image_size: 512
             path: /mnt/data1/public_datasets/Deepfake
             config_file: /mnt/data1/public_datasets/Deepfake/FaceForensics++.json
 
@@ -111,8 +111,8 @@ evaluator:
       threshold: 0.5
 
 # Training related
-batch_size: 32
-test_batch_size: 32
+batch_size: 10
+test_batch_size: 8
 epochs: 20
 accum_iter: 1
 record_epoch: 0  # Save the best only after record epoch.
@@ -125,7 +125,7 @@ test_period: 1
 log_per_epoch_count: 20
 
 # DDP & AMP settings
-find_unused_parameters: true
+find_unused_parameters: false
 use_amp: false
 
 # Optimizer parameters
