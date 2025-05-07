@@ -82,7 +82,7 @@ class DocumentCrossDataset(BaseDataset):
         if self.post_transform:
             out = self.post_transform(image=image, mask=mask)
             image = out['image']
-            mask = out['image']
+            mask = out['mask']
         mask = mask.float()
         output = {
             "image": image,
