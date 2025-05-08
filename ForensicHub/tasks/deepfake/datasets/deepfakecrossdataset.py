@@ -89,6 +89,23 @@ class DeepfakeCrossDataset(BaseDataset):
 
         return output
 
+    def __str__(self):
+        label_counts = {0: 0, 1: 0}
+        for sample in self.samples:
+            label = sample["label"]
+            if label in label_counts:
+                label_counts[label] += 1
+            else:
+                label_counts[label] = 1  # 处理非0/1情况
+
+        return (f"DeepfakeCrossDataset from config: {self.config_file}\n"
+                f"Root path: {self.path}\n"
+                f"Compression: {self.compression}\n"
+                f"Split mode: {self.split_mode}\n"
+                f"Total samples: {len(self.samples)}\n"
+                f"Label 0 (real) samples: {label_counts.get(0, 0)}\n"
+                f"Label 1 (fake) samples: {label_counts.get(1, 0)}")
+
 
 if __name__ == '__main__':
     dataset = DeepfakeCrossDataset(path='/mnt/data1/public_datasets/Deepfake',

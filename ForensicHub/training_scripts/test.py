@@ -93,7 +93,7 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
         })
         test_dataset_list[test_args["dataset_name"]] = build_from_registry(DATASETS, test_args)
     for t_args, dataset in zip(test_dataset_args, test_dataset_list.values()):
-        print(f"Test dataset: {t_args['dataset_name']} (length: {len(dataset)})")
+        print(f"Test dataset: {t_args['dataset_name']}\n{str(dataset)}\n")
 
     # Start go through each datasets:
     for dataset_name, test_dataset in test_dataset_list.items():

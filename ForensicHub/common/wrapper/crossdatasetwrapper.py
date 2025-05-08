@@ -64,10 +64,10 @@ class CrossDataset(BaseDataset):
         raise IndexError("Index out of range")
 
     def __str__(self):
-        # 打印 CrossDataset 信息
-        info = f"<===CrossDataset with {len(self.datasets)} datasets: {str(self.dataset_names)}===>\n"
+        info = f"<=== CrossDataset with {len(self.datasets)} datasets: {self.dataset_names} ===>\n"
         for i, ds in enumerate(self.datasets):
-            info += f"  └─ Dataset {i}: {len(ds):,} samples, random sample: {self.pic_nums[i]}\n"
-        info += f"Total samples per epoch: {self.__len__():,}\n"
+            info += f"\n[Dataset {i} - {self.dataset_names[i]}]\n"
+            info += str(ds) + "\n"
+        info += f"\nTotal samples per epoch: {self.__len__():,}\n"
         info += f"<================================================>\n"
         return info

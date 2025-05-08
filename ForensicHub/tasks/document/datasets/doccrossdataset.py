@@ -18,7 +18,6 @@ class DocumentCrossDataset(BaseDataset):
         """Read dataset directories and parse image paths, masks, and labels."""
         all_samples = []
 
-        # 确保 path 是 list 类型（兼容 str）
         path_list = [self.path] if isinstance(self.path, str) else self.path
 
         for path_id, one_path in enumerate(path_list):
@@ -73,6 +72,7 @@ class DocumentCrossDataset(BaseDataset):
         mask = Image.open(mask_path).convert("L")  # 'L'模式表示灰度图
         mask = mask.resize((self.image_size, self.image_size), resample=Image.NEAREST)
         mask = np.array(mask)
+        mask = mask / 255.
 
         # Apply transforms
         if self.common_transform:
@@ -95,6 +95,10 @@ class DocumentCrossDataset(BaseDataset):
             self.post_funcs(output)
 
         return output
+
+    def __str__(self):
+        return (f"DocumentCrossDataset from: {self.entry_path}\n"
+                f"Total samples: {len(self.samples)}\n")
 
 
 if __name__ == '__main__':

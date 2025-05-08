@@ -22,12 +22,17 @@ class Mask2LabelWrapper(BaseModel):
         self.loss_fn = nn.BCEWithLogitsLoss()
 
     def forward(self, image, label, *args, **kwargs):
-        mask = torch.randint(0, 1, (image.shape[0], 1, image.shape[2], image.shape[3])).long().to(image.device)
-        edge_mask = torch.randint(0, 1, (image.shape[0], 1, image.shape[2], image.shape[3])).long().to(image.device)
+        if not 'mask' in kwargs:
+            mask = torch.randint(0, 1, (image.shape[0], 1, image.shape[2], image.shape[3])).long().to(image.device)
+        else:
+            mask = kwargs['mask']
+        if not 'edge_mask' in kwargs:
+            edge_mask = torch.randint(0, 1, (image.shape[0], 1, image.shape[2], image.shape[3])).long().to(image.device)
+        else:
+            edge_mask = kwargs['edge_mask']
         label = label.float()
         if self.name in ['IML_ViT', 'Mesorch', 'Cat_Net']:
-            features = self.base_model.forward_features(image=image, mask=mask, edge_mask=edge_mask, label=label, *args,
-                                                        **kwargs)
+            features = self.base_model.forward_features(image=image, mask=mask, edge_mask=edge_mask, label=label)
             if type(features) == tuple:
                 features = features[0]
             pred_label = self.head(features)
@@ -43,7 +48,7 @@ class Mask2LabelWrapper(BaseModel):
             pred_label = pred_label.view(-1)
             loss = F.binary_cross_entropy(pred_label, label)
         else:
-            outputs = self.base_model(image=image, mask=mask, edge_mask=edge_mask, label=label, *args, **kwargs)
+            outputs = self.base_model(image=image, mask=mask, edge_mask=edge_mask, label=label)
             pred_label = outputs['pred_label']
             loss = F.binary_cross_entropy(pred_label, label.float())
         # ----------Output interface--------------------------------------

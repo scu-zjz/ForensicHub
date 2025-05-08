@@ -1,9 +1,9 @@
 # DDP
-gpus: "0"
+gpus: "0,1,2,3"
 flag: train
 
 # Log
-log_dir: "./log/crossdataset_image/crossdataset_spsl_train"
+log_dir: "./log/crossdataset_image_new/crossdataset_spsl_train"
 
 # Task
 if_predict_label: true
@@ -44,7 +44,6 @@ train_dataset:
         init_config:
           image_size: 256
           path:
-            - /mnt/data1/public_datasets/Doc/DocTamperV1-TrainingSet_reset_to_realworld
             - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/OSTF_train
             - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/RealTextManipulation_train
             - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/T-SROIE_train
@@ -58,44 +57,32 @@ train_dataset:
 
 #  Test dataset (one or many)
 test_dataset:
-  - name: CrossDataset
-    dataset_name: CrossDataset
+  - name: JsonDataset
+    dataset_name: IMD2020
     init_config:
-      dataset_config:
-        - name: IMDLCrossDataset
-          pic_nums: 500
-          init_config:
-            image_size: 256
-            path: /mnt/data0/public_datasets/IML/CASIAv2_with_label.json
-        - name: AIGCCrossDataset
-          pic_nums: 500
-          init_config:
-            image_size: 256
-            path:
-              - /mnt/data3/public_datasets/AIGC/GenImage/ADM_train.json
-              - /mnt/data3/public_datasets/AIGC/GenImage/BigGAN_train.json
-              - /mnt/data3/public_datasets/AIGC/GenImage/glide_train.json
-              - /mnt/data3/public_datasets/AIGC/GenImage/Midjourney_train.json
-              - /mnt/data3/public_datasets/AIGC/GenImage/stable_diffusion_v_1_4_train.json
-              - /mnt/data3/public_datasets/AIGC/GenImage/stable_diffusion_v_1_5_train.json
-              - /mnt/data3/public_datasets/AIGC/GenImage/VQDM_train.json
-              - /mnt/data3/public_datasets/AIGC/GenImage/wukong_train.json
-        - name: DocumentCrossDataset
-          pic_nums: 500
-          init_config:
-            image_size: 256
-            path:
-              - /mnt/data1/public_datasets/Doc/DocTamperV1-TrainingSet_reset_to_realworld
-              - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/OSTF_train
-              - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/RealTextManipulation_train
-              - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/T-SROIE_train
-              - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/Tampered-IC13_train
-        - name: DeepfakeCrossDataset
-          pic_nums: 500
-          init_config:
-            image_size: 256
-            path: /mnt/data1/public_datasets/Deepfake
-            config_file: /mnt/data1/public_datasets/Deepfake/FaceForensics++.json
+      image_size: 256
+      path: /mnt/data0/public_datasets/IML/IMD_20_1024_full.json
+      # Dataset specific setting
+      is_resizing: true
+      is_padding: false
+  - name: AIGCLabelDataset
+    dataset_name: DiffusionForensics_test
+    init_config:
+      image_size: 256
+      path: /mnt/data3/public_datasets/AIGC/DiffusionForensics/images/test.json
+  - name: DocumentCrossDataset
+    dataset_name: OSTF_test
+    init_config:
+      image_size: 256
+      path:
+        - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/OSTF_test
+  - name: DeepfakeCrossDataset
+    dataset_name: FF-DF_test
+    init_config:
+      image_size: 256
+      path: /mnt/data1/public_datasets/Deepfake
+      config_file: /mnt/data1/public_datasets/Deepfake/FF-DF.json
+      split_mode: test
 
 # Transform
 transform:
@@ -110,11 +97,11 @@ evaluator:
       threshold: 0.5
 
 # Training related
-batch_size: 32
+batch_size: 128
 test_batch_size: 32
 epochs: 20
 accum_iter: 1
-record_epoch: 0  # Save the best only after record epoch.
+record_epoch: 20  # Save the best only after record epoch.
 
 # Test related
 no_model_eval: false

@@ -45,6 +45,7 @@ class IMDLCrossDataset(BaseDataset):
             mask = Image.open(mask_path).convert("L")  # 'L'模式表示灰度图
             mask = mask.resize((self.image_size, self.image_size))
             mask = np.array(mask)
+            mask = mask / 255.
 
         # Apply transforms
         if self.common_transform:
@@ -67,3 +68,11 @@ class IMDLCrossDataset(BaseDataset):
             self.post_funcs(output)
 
         return output
+
+    def __str__(self):
+        label_0 = sum(1 for s in self.samples if s["label"] == 0)
+        label_1 = sum(1 for s in self.samples if s["label"] == 1)
+        return (f"IMDLCrossDataset from: {self.entry_path}\n"
+                f"Total samples: {len(self.samples)}\n"
+                f"Label 0 (real): {label_0}\n"
+                f"Label 1 (fake): {label_1}")

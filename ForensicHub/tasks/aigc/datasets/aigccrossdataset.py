@@ -70,3 +70,17 @@ class AIGCCrossDataset(BaseDataset):
             self.post_funcs(output)
 
         return output
+
+    def __str__(self):
+        label_counts = {0: 0, 1: 0}
+        for sample in self.samples:
+            label = sample["label"]
+            if label in label_counts:
+                label_counts[label] += 1
+            else:
+                label_counts[label] = 1  # 如果出现了非0/1的标签，也记录
+
+        return (f"AIGCCrossDataset from {self.entry_path}\n"
+                f"Total samples: {len(self.samples)}\n"
+                f"Label 0 samples (real): {label_counts.get(0, 0)}\n"
+                f"Label 1 samples (fake): {label_counts.get(1, 0)}")

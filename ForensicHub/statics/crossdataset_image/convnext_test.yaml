@@ -1,10 +1,10 @@
 # DDP
-gpus: "0,1,2,3"
+gpus: "4,5"
 flag: test
 
 # Log
-log_dir: "./log/crossdataset_image/test/resnet101_none"
-checkpoint_path: /mnt/data1/dubo/workspace/ForensicHub/log/crossdataset_image/crossdataset_resnet101_none_train
+log_dir: "./log/crossdataset_image_new_test/convnextsmall_none"
+checkpoint_path: /mnt/data1/dubo/workspace/ForensicHub/log/crossdataset_image_new/crossdataset_convnextsmall_none_train
 
 # Task
 if_predict_label: true
@@ -18,7 +18,7 @@ transform:
 
 # Model
 model:
-  name: Resnet101
+  name: ConvNextSmall
   # Model specific setting
   init_config:
     output_type: label
@@ -137,24 +137,24 @@ test_dataset:
       path:
         - /mnt/data3/public_datasets/AIGC/GenImage/wukong_val.json
   # Document
-  - name: DocumentCrossDataset
-    dataset_name: DocTamperV1-TestingSet
-    init_config:
-      image_size: 256
-      path:
-        - /mnt/data1/public_datasets/Doc/DocTamperV1/DocTamperV1-TestingSet
-  - name: DocumentCrossDataset
-    dataset_name: DocTamperV1-FCD
-    init_config:
-      image_size: 256
-      path:
-        - /mnt/data1/public_datasets/Doc/DocTamperV1/DocTamperV1-FCD
-  - name: DocumentCrossDataset
-    dataset_name: DocTamperV1-SCD
-    init_config:
-      image_size: 256
-      path:
-        - /mnt/data1/public_datasets/Doc/DocTamperV1/DocTamperV1-SCD
+  #  - name: DocumentCrossDataset
+  #    dataset_name: DocTamperV1-TestingSet
+  #    init_config:
+  #      image_size: 256
+  #      path:
+  #        - /mnt/data1/public_datasets/Doc/DocTamperV1/DocTamperV1-TestingSet
+  #  - name: DocumentCrossDataset
+  #    dataset_name: DocTamperV1-FCD
+  #    init_config:
+  #      image_size: 256
+  #      path:
+  #        - /mnt/data1/public_datasets/Doc/DocTamperV1/DocTamperV1-FCD
+  #  - name: DocumentCrossDataset
+  #    dataset_name: DocTamperV1-SCD
+  #    init_config:
+  #      image_size: 256
+  #      path:
+  #        - /mnt/data1/public_datasets/Doc/DocTamperV1/DocTamperV1-SCD
   - name: DocumentCrossDataset
     dataset_name: OSTF_test
     init_config:
@@ -167,12 +167,12 @@ test_dataset:
       image_size: 256
       path:
         - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/RealTextManipulation_test
-#  - name: DocumentCrossDataset
-#    dataset_name: T-SROIE_test
-#    init_config:
-#      image_size: 256
-#      path:
-#        - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/T-SROIE_test
+  - name: DocumentCrossDataset
+    dataset_name: T-SROIE_test
+    init_config:
+      image_size: 256
+      path:
+        - /mnt/data1/public_datasets/Doc/cutted_datasets_alls/T-SROIE_test
   - name: DocumentCrossDataset
     dataset_name: Tampered-IC13_test
     init_config:
