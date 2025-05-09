@@ -75,12 +75,14 @@ def main(args, model_args, train_dataset_args, test_dataset_args, transform_args
     start_time = time.time()
     # get post function (if have)
     post_function_name = f"{model_args['name']}_post_func".lower()
+    if model_args.get('post_func_name') is not None:
+        post_function_name = f"{model_args['post_func_name']}_post_func".lower()
     print(f"Post function check: {post_function_name}")
-    print(POSTFUNCS)
     if POSTFUNCS.has(post_function_name):
         post_function = POSTFUNCS.get(post_function_name)
     else:
         post_function = None
+    print(post_function)
 
     dataset_dict = {}
     dataset_logger = {}
