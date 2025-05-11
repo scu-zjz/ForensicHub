@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from functools import partial
+from .extractors.fph import FPH
 
 from timm.models.layers import DropPath, to_2tuple, trunc_normal_
 import math
@@ -290,7 +291,7 @@ class MixVisionTransformer(BaseModel):
 
         if output_type == 'label':
             self.head = nn.Sequential(
-                nn.AdaptiveMaxPool2d(1),
+                nn.AdaptiveAvgPool2d(1),
                 nn.Flatten(),
                 nn.Linear(512, 1)
             )
@@ -444,3 +445,108 @@ class DCTSegformerb3(MixVisionTransformer):
                          qkv_bias=True, norm_layer=partial(nn.LayerNorm, eps=1e-6), depths=[3, 4, 18, 3],
                          sr_ratios=[8, 4, 2, 1],
                          drop_rate=0.0, drop_path_rate=0.1)
+
+
+@register_model("QtSegformerb3")
+class QtSegformerb3(MixVisionTransformer):
+    def __init__(self, output_type='label', pretrain_path='', image_size=256):
+        super().__init__(input_head=None, output_type=output_type,
+                         pretrain_path=pretrain_path, image_size=image_size,
+                         patch_size=4, embed_dims=[64, 128, 320, 512],
+                         num_heads=[1, 2, 5, 8], mlp_ratios=[4, 4, 4, 4],
+                         qkv_bias=True, norm_layer=partial(nn.LayerNorm, eps=1e-6),
+                         depths=[3, 4, 18, 3], sr_ratios=[8, 4, 2, 1],
+                         drop_rate=0.0, drop_path_rate=0.1)
+
+        self.fph = FPH()
+
+        # 分解Segformer结构
+        self.patch_embed1_proj = self.patch_embed1.proj
+        self.patch_embed1_norm = self.patch_embed1.norm
+
+        # 融合层 (Segformer第一层输出通道是64)
+        self.fusion_conv = nn.Conv2d(64 + 256, 64, kernel_size=1)
+
+        # 重建head确保维度匹配
+        out_channels = 512  # SegformerB3最终特征维度
+        if output_type == 'label':
+            self.head = nn.Sequential(
+                nn.AdaptiveAvgPool2d(1),
+                nn.Flatten(),
+                nn.Linear(out_channels, 1)
+            )
+        else:
+            self.head = nn.Sequential(
+                nn.Conv2d(out_channels, out_channels // 2, kernel_size=3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(out_channels // 2, out_channels // 4, kernel_size=3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(out_channels // 4, 1, kernel_size=1),
+                nn.Upsample(size=(image_size, image_size), mode='bilinear', align_corners=False)
+            )
+
+    def forward(self, image, dct, qt, *args, **kwargs):
+        dct = dct.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]
+        # FPH特征提取 (B, 256, H/8, W/8)
+        x_aux = self.fph(dct, qt)
+
+        # 主干初始部分
+        B = image.shape[0]
+        x = self.patch_embed1_proj(image)  # [B, 64, H/4, W/4]
+        _, _, H, W = x.shape
+
+        # 尺寸对齐
+        if x.shape[-2:] != x_aux.shape[-2:]:
+            x_aux = F.interpolate(x_aux, size=(H, W), mode='bilinear', align_corners=False)
+
+        # 拼接并融合
+        x = torch.cat([x, x_aux], dim=1)
+        x = self.fusion_conv(x)
+
+        # 继续Segformer流程
+        x = x.flatten(2).transpose(1, 2)
+        x = self.patch_embed1_norm(x)
+
+        # stage 1
+        for i, blk in enumerate(self.block1):
+            x = blk(x, H, W)
+        x = self.norm1(x)
+        x = x.reshape(B, H, W, -1).permute(0, 3, 1, 2).contiguous()
+
+        # stage 2
+        x, H, W = self.patch_embed2(x)
+        for i, blk in enumerate(self.block2):
+            x = blk(x, H, W)
+        x = self.norm2(x)
+        x = x.reshape(B, H, W, -1).permute(0, 3, 1, 2).contiguous()
+
+        # stage 3
+        x, H, W = self.patch_embed3(x)
+        for i, blk in enumerate(self.block3):
+            x = blk(x, H, W)
+        x = self.norm3(x)
+        x = x.reshape(B, H, W, -1).permute(0, 3, 1, 2).contiguous()
+
+        # stage 4
+        x, H, W = self.patch_embed4(x)
+        for i, blk in enumerate(self.block4):
+            x = blk(x, H, W)
+        x = self.norm4(x)
+        x = x.reshape(B, H, W, -1).permute(0, 3, 1, 2).contiguous()
+
+        out = self.head(x)
+
+        if self.output_type == 'label':
+            if len(out.shape) == 2:
+                out = out.squeeze(dim=1)
+            loss = F.binary_cross_entropy_with_logits(out, kwargs['label'].float())
+            pred = out.sigmoid()
+        else:
+            loss = F.binary_cross_entropy_with_logits(out, kwargs['mask'].float())
+            pred = out.sigmoid()
+
+        return {
+            "backward_loss": loss,
+            f"pred_{self.output_type}": pred,
+            "visual_loss": {"combined_loss": loss}
+        }

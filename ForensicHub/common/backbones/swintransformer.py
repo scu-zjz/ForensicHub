@@ -3,7 +3,7 @@ import timm
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.utils.model_zoo as model_zoo
+from .extractors.fph import FPH
 
 from ForensicHub.core.base_model import BaseModel
 from ForensicHub.registry import register_model
@@ -131,3 +131,89 @@ class DCTSwinSmall(SwinTransformer):
         super().__init__(input_head=DCTExtractor(), output_type=output_type,
                          backbone='swin_small_patch4_window7_224', pretrained=pretrained,
                          image_size=image_size, num_channels=3)
+
+
+@register_model("QtSwinSmall")
+class QtSwinSmall(SwinTransformer):
+    def __init__(self, output_type='label', pretrained=True, image_size=256):
+        super().__init__(input_head=None, output_type=output_type,
+                         backbone='swin_small_patch4_window7_224', pretrained=pretrained,
+                         image_size=image_size, num_channels=0)
+        self.fph = FPH()
+
+        # 分解Swin Transformer结构
+        self.patch_embed = self.model.patch_embed
+        self.layers = nn.ModuleList([
+            self.model.layers[0],
+            self.model.layers[1],
+            self.model.layers[2],
+            self.model.layers[3]
+        ])
+        self.norm = self.model.norm
+
+        # 融合层 (Swin Small第一层输出通道是96)
+        self.fusion_conv = nn.Conv2d(96 + 256, 96, kernel_size=1)
+
+        # 重建head确保维度匹配
+        out_channels = self.model.num_features
+        if output_type == 'label':
+            self.head = nn.Sequential(
+                nn.AdaptiveAvgPool2d(1),
+                nn.Flatten(),
+                nn.Linear(out_channels, 1)
+            )
+        else:
+            self.head = nn.Sequential(
+                nn.Conv2d(out_channels, out_channels // 2, kernel_size=3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(out_channels // 2, out_channels // 4, kernel_size=3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(out_channels // 4, 1, kernel_size=1),
+                nn.Upsample(size=(image_size, image_size), mode='bilinear', align_corners=False)
+            )
+
+    def forward(self, image, dct, qt, *args, **kwargs):
+        dct = dct.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]
+        # FPH特征提取 (B, 256, H/8, W/8)
+        x_aux = self.fph(dct, qt)
+
+        # 主干初始部分
+        x = self.patch_embed(image)  # [B, H/4*W/4, C=96]
+
+        # 调整形状用于融合 [B, H/4, W/4, C] -> [B, C, H/4, W/4]
+        x = x.permute(0, 3, 1, 2)
+
+        # 尺寸对齐
+        if x.shape[-2:] != x_aux.shape[-2:]:
+            x_aux = F.interpolate(x_aux, size=x.shape[-2:], mode='bilinear', align_corners=False)
+
+        # 拼接并融合
+        x = torch.cat([x, x_aux], dim=1)
+        x = self.fusion_conv(x)
+
+        x = x.permute(0, 2, 3, 1)
+
+        # 继续Swin Transformer主体
+        for layer in self.layers:
+            x = layer(x)
+        x = self.norm(x)
+
+        # 调整形状 [B, H*W, C] -> [B, C, H, W]
+        x = x.permute(0, 3, 1, 2)
+
+        out = self.head(x)
+
+        if self.output_type == 'label':
+            if len(out.shape) == 2:
+                out = out.squeeze(dim=1)
+            loss = F.binary_cross_entropy_with_logits(out, kwargs['label'].float())
+            pred = out.sigmoid()
+        else:
+            loss = F.binary_cross_entropy_with_logits(out, kwargs['mask'].float())
+            pred = out.sigmoid()
+
+        return {
+            "backward_loss": loss,
+            f"pred_{self.output_type}": pred,
+            "visual_loss": {"combined_loss": loss}
+        }

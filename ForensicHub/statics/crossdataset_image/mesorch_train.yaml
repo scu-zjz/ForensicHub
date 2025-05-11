@@ -3,7 +3,7 @@ gpus: "0,1,2,3"
 flag: train
 
 # Log
-log_dir: "./log/crossdataset_image_new/crossdataset_resnet101_none_avgpooling_train"
+log_dir: "./log/crossdataset_image_new/crossdataset_mesorch_train"
 
 # Task
 if_predict_label: true
@@ -11,11 +11,12 @@ if_predict_mask: false
 
 # Model
 model:
-  name: Resnet101
-  # Model specific setting
+  name: Mask2LabelWrapper
   init_config:
-    output_type: label
-    image_size: 256
+    name: Mesorch
+    init_config:
+      conv_pretrain: true
+      seg_pretrain_path: /mnt/data0/xuekang/workspace/convswin/mit_b3.pth
 
 # Train dataset
 train_dataset:
@@ -89,6 +90,8 @@ test_dataset:
 # Transform
 transform:
   name: AIGCTransform
+  init_config:
+    norm_type: image_net
 
 # Evaluators
 evaluator:
@@ -97,8 +100,8 @@ evaluator:
       threshold: 0.5
 
 # Training related
-batch_size: 512
-test_batch_size: 128
+batch_size: 128
+test_batch_size: 32
 epochs: 20
 accum_iter: 1
 record_epoch: 20  # Save the best only after record epoch.
@@ -116,9 +119,9 @@ use_amp: true
 
 # Optimizer parameters
 weight_decay: 0.05
-lr: 1e-4
+lr: 0.0001
 blr: 0.001
-min_lr: 1e-5
+min_lr: 0.00001
 warmup_epochs: 1
 
 # Device and training control

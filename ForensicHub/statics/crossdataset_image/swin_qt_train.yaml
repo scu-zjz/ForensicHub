@@ -3,7 +3,7 @@ gpus: "0,1,2,3"
 flag: train
 
 # Log
-log_dir: "./log/crossdataset_image_new/crossdataset_resnet101_none_avgpooling_train"
+log_dir: "./log/crossdataset_image_new/crossdataset_swin_qt_train"
 
 # Task
 if_predict_label: true
@@ -11,7 +11,8 @@ if_predict_mask: false
 
 # Model
 model:
-  name: Resnet101
+  name: QtSwinSmall
+  post_func_name: DTD
   # Model specific setting
   init_config:
     output_type: label
@@ -97,8 +98,8 @@ evaluator:
       threshold: 0.5
 
 # Training related
-batch_size: 512
-test_batch_size: 128
+batch_size: 128
+test_batch_size: 64
 epochs: 20
 accum_iter: 1
 record_epoch: 20  # Save the best only after record epoch.

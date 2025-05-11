@@ -3,7 +3,7 @@ gpus: "0,1,2,3"
 flag: train
 
 # Log
-log_dir: "./log/crossdataset_image_new/crossdataset_resnet101_none_avgpooling_train"
+log_dir: "./log/crossdataset_image_new/crossdataset_resnet101_dct_train"
 
 # Task
 if_predict_label: true
@@ -11,7 +11,7 @@ if_predict_mask: false
 
 # Model
 model:
-  name: Resnet101
+  name: DCTResnet101
   # Model specific setting
   init_config:
     output_type: label

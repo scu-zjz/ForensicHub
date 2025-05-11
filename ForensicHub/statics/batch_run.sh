@@ -2,9 +2,12 @@
 
 # 存放多个配置文件路径的列表
 yaml_list=(
-  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/crossdataset_image/psccnet_train.yaml"
-  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/crossdataset_image/dtd_train.yaml"
-  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/crossdataset_image/ffdn_train.yaml"
+  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/crossdataset_image/xception_qt_train.yaml"
+  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/crossdataset_image/swin_qt_train.yaml"
+  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/crossdataset_image/segformer_qt_train.yaml"
+  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/crossdataset_image/efficientnet_qt_train.yaml"
+  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/crossdataset_image/resnet_qt_train.yaml"
+  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/crossdataset_image/convnext_qt_train.yaml"
   # 继续添加更多 YAML 路径
 )
 

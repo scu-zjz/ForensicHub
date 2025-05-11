@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
+from .extractors.fph import FPH
 
 from ForensicHub.core.base_model import BaseModel
 from ForensicHub.registry import register_model
@@ -131,3 +132,54 @@ class DCTConvNextSmall(ConvNext):
         super().__init__(input_head=DCTExtractor(), output_type=output_type,
                          backbone='convnext_small', pretrained=pretrained,
                          image_size=image_size, num_channels=3)
+
+
+@register_model("QtConvNextSmall")
+class QtConvNextSmall(ConvNext):
+    def __init__(self, output_type='label', pretrained=True, image_size=256):
+        super().__init__(input_head=None, output_type=output_type,
+                         backbone='convnext_small', pretrained=pretrained,
+                         image_size=image_size, num_channels=0)
+
+        self.fph = FPH()
+
+        # ConvNeXt的前几个模块：stem, stages
+        self.stem = self.model.stem
+        self.stages = self.model.stages  # 分层结构
+
+        # 拼接 FPH 后进行通道融合
+        stem_out_channels = self.stem[0].out_channels  # ConvNeXt 的 stem 输出通道
+        self.fusion_conv = nn.Conv2d(stem_out_channels + 256, stem_out_channels, kernel_size=1)
+
+    def forward(self, image, dct, qt, *args, **kwargs):
+        dct = dct.squeeze(1).long()  # [B, 1, H, W] -> [B, H, W]
+        x_aux = self.fph(dct, qt)  # -> [B, 256, H/8, W/8]
+
+        x = self.stem(image)  # ConvNeXt 的 stem，输出一般为 H/4
+        if x.shape[-2:] != x_aux.shape[-2:]:
+            x_aux = F.interpolate(x_aux, size=x.shape[-2:], mode='bilinear', align_corners=False)
+
+        # 融合特征：concat + 1x1 conv 降维
+        x = torch.cat([x, x_aux], dim=1)
+        x = self.fusion_conv(x)
+
+        # 继续 ConvNeXt 的主干
+        for stage in self.stages:
+            x = stage(x)
+
+        out = self.head(x)
+
+        if self.output_type == 'label':
+            if len(out.shape) == 2:
+                out = out.squeeze(dim=1)
+            loss = F.binary_cross_entropy_with_logits(out, kwargs['label'].float())
+            pred = out.sigmoid()
+        else:
+            loss = F.binary_cross_entropy_with_logits(out, kwargs['mask'].float())
+            pred = out.sigmoid()
+
+        return {
+            "backward_loss": loss,
+            f"pred_{self.output_type}": pred,
+            "visual_loss": {"combined_loss": loss}
+        }

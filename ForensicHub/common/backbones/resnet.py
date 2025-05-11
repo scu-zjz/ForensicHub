@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
+from .extractors.fph import FPH
 
 from ForensicHub.core.base_model import BaseModel
 from ForensicHub.registry import register_model
@@ -33,7 +34,7 @@ class Resnet(BaseModel):
 
         if output_type == 'label':
             self.head = nn.Sequential(
-                nn.AdaptiveMaxPool2d(1),
+                nn.AdaptiveAvgPool2d(1),
                 nn.Flatten(),
                 nn.Linear(out_channels, 1)
             )
@@ -140,3 +141,66 @@ class DCTResnet101(Resnet):
         super().__init__(input_head=DCTExtractor(), output_type=output_type, backbone='resnet101',
                          pretrained=pretrained,
                          image_size=image_size, num_channels=3)
+
+
+@register_model("QtResnet101")
+class QtResnet101(Resnet):
+    def __init__(self, output_type='label', pretrained=True, image_size=256):
+        super().__init__(input_head=None, output_type=output_type,
+                         backbone='resnet101', pretrained=pretrained,
+                         image_size=image_size, num_channels=0)
+        self.fph = FPH()
+
+        # 定位主干中间模块
+        self.stem = nn.Sequential(
+            self.model.conv1,  # conv1
+            self.model.bn1,
+            self.model.act1,
+            self.model.maxpool
+        )
+        # 主干后续部分
+        self.blocks = nn.Sequential(
+            self.model.layer1,
+            self.model.layer2,
+            self.model.layer3,
+            self.model.layer4
+        )
+
+        # 通道融合（拼接后通道不一致）
+        in_channels = self.model.layer1[0].conv1.in_channels + 256  # 通常是 64 + 256
+        self.fusion_conv = nn.Conv2d(in_channels, self.model.layer1[0].conv1.in_channels, kernel_size=1)
+
+    def forward(self, image, dct, qt, *args, **kwargs):
+        dct = dct.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]
+        # FPH 特征（B, 256, H/8, W/8）
+        x_aux = self.fph(dct, qt)
+
+        # 主干前部分
+        x = self.stem(image)
+
+        # 若尺寸不一致，则插值对齐
+        if x.shape[-2:] != x_aux.shape[-2:]:
+            x_aux = F.interpolate(x_aux, size=x.shape[-2:], mode='bilinear', align_corners=False)
+
+        # 拼接并降维融合
+        x = torch.cat([x, x_aux], dim=1)
+        x = self.fusion_conv(x)
+
+        # 继续主干
+        x = self.blocks(x)
+        out = self.head(x)
+
+        if self.output_type == 'label':
+            if len(out.shape) == 2:
+                out = out.squeeze(dim=1)
+            loss = F.binary_cross_entropy_with_logits(out, kwargs['label'].float())
+            pred = out.sigmoid()
+        else:
+            loss = F.binary_cross_entropy_with_logits(out, kwargs['mask'].float())
+            pred = out.sigmoid()
+
+        return {
+            "backward_loss": loss,
+            f"pred_{self.output_type}": pred,
+            "visual_loss": {"combined_loss": loss}
+        }

@@ -3,7 +3,7 @@ gpus: "0,1,2,3"
 flag: train
 
 # Log
-log_dir: "./log/crossdataset_image_new/crossdataset_resnet101_none_avgpooling_train"
+log_dir: "./log/crossdataset_image_new/crossdataset_convnextsmall_qt_train"
 
 # Task
 if_predict_label: true
@@ -11,7 +11,8 @@ if_predict_mask: false
 
 # Model
 model:
-  name: Resnet101
+  name: QtConvNextSmall
+  post_func_name: DTD
   # Model specific setting
   init_config:
     output_type: label
@@ -86,6 +87,7 @@ test_dataset:
       config_file: /mnt/data1/public_datasets/Deepfake/FF-DF.json
       split_mode: test
 
+
 # Transform
 transform:
   name: AIGCTransform
@@ -97,7 +99,7 @@ evaluator:
       threshold: 0.5
 
 # Training related
-batch_size: 512
+batch_size: 128
 test_batch_size: 128
 epochs: 20
 accum_iter: 1
