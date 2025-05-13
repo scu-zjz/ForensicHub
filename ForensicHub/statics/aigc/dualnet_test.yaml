@@ -3,7 +3,7 @@ gpus: "4,5"
 flag: test
 
 # Log
-log_dir: "./log/aigc_dualnet_df_test"
+log_dir: "./log/aigc/aigc_dualnet_df_test"
 
 # Task
 if_predict_label: true
@@ -17,11 +17,7 @@ model:
 
 #  Test dataset (one or many)
 test_dataset:
-  - name: AIGCLabelDataset
-    dataset_name: DiffusionForensics_test
-    init_config:
-      image_size: 224
-      path: /mnt/data1/public_datasets/AIGC/DiffusionForensics/images/test.json
+  # IMDL:
   - name: JsonDataset
     dataset_name: COVERAGE
     init_config:
@@ -54,6 +50,83 @@ test_dataset:
       # Dataset specific setting
       is_resizing: true
       is_padding: false
+  - name: AIGCLabelDataset
+    dataset_name: Cocoglide
+    init_config:
+      image_size: 224
+      path: /mnt/data0/public_datasets/IML/CocoGlide/dataset.json
+  - name: AIGCLabelDataset
+    dataset_name: Autosplice
+    init_config:
+      image_size: 224
+      path: /mnt/data0/public_datasets/IML/Autosplice/AutoSplice/label.json
+  # AIGC
+  - name: AIGCLabelDataset
+    dataset_name: DiffusionForensics_test
+    init_config:
+      image_size: 224
+      path: /mnt/data3/public_datasets/AIGC/DiffusionForensics/images/test.json
+  - name: AIGCCrossDataset
+    dataset_name: GenImage_all
+    init_config:
+      image_size: 224
+      path:
+        - /mnt/data3/public_datasets/AIGC/GenImage/ADM_val.json
+        - /mnt/data3/public_datasets/AIGC/GenImage/BigGAN_val.json
+        - /mnt/data3/public_datasets/AIGC/GenImage/glide_val.json
+        - /mnt/data3/public_datasets/AIGC/GenImage/Midjourney_val.json
+        - /mnt/data3/public_datasets/AIGC/GenImage/stable_diffusion_v_1_4_val.json
+        - /mnt/data3/public_datasets/AIGC/GenImage/stable_diffusion_v_1_5_val.json
+        - /mnt/data3/public_datasets/AIGC/GenImage/VQDM_val.json
+        - /mnt/data3/public_datasets/AIGC/GenImage/wukong_val.json
+  - name: AIGCCrossDataset
+    dataset_name: GenImage_ADM
+    init_config:
+      image_size: 224
+      path:
+        - /mnt/data3/public_datasets/AIGC/GenImage/ADM_val.json
+  - name: AIGCCrossDataset
+    dataset_name: GenImage_BigGAN
+    init_config:
+      image_size: 224
+      path:
+        - /mnt/data3/public_datasets/AIGC/GenImage/BigGAN_val.json
+  - name: AIGCCrossDataset
+    dataset_name: GenImage_glide
+    init_config:
+      image_size: 224
+      path:
+        - /mnt/data3/public_datasets/AIGC/GenImage/glide_val.json
+  - name: AIGCCrossDataset
+    dataset_name: GenImage_Midjourney
+    init_config:
+      image_size: 224
+      path:
+        - /mnt/data3/public_datasets/AIGC/GenImage/Midjourney_val.json
+  - name: AIGCCrossDataset
+    dataset_name: GenImage_sd14
+    init_config:
+      image_size: 224
+      path:
+        - /mnt/data3/public_datasets/AIGC/GenImage/stable_diffusion_v_1_4_val.json
+  - name: AIGCCrossDataset
+    dataset_name: GenImage_sd15
+    init_config:
+      image_size: 224
+      path:
+        - /mnt/data3/public_datasets/AIGC/GenImage/stable_diffusion_v_1_5_val.json
+  - name: AIGCCrossDataset
+    dataset_name: GenImage_VQDM
+    init_config:
+      image_size: 224
+      path:
+        - /mnt/data3/public_datasets/AIGC/GenImage/VQDM_val.json
+  - name: AIGCCrossDataset
+    dataset_name: GenImage_wukong
+    init_config:
+      image_size: 224
+      path:
+        - /mnt/data3/public_datasets/AIGC/GenImage/wukong_val.json
 
 # Transform
 transform:
@@ -71,7 +144,7 @@ evaluator:
   - name: ImageTPR
   - name: ImageAccuracy
 
-checkpoint_path: /mnt/data1/dubo/workspace/ForensicHub/log/aigc_dualnet_df_train
+checkpoint_path: /mnt/data1/dubo/workspace/ForensicHub/log/aigc_df/aigc_dualnet_df_train
 test_batch_size: 64
 
 # Device

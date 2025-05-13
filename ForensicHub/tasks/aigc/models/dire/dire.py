@@ -16,14 +16,14 @@ Dire for diffusion-generated image detection
 @register_model("Dire")
 class Dire(BaseModel):
     def __init__(self,
-                 model_path="/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/tasks/aigc/models/dire/lsun_bedroom.pt",
+                 model_path="/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/tasks/aigc/models/dire/imagenet_adm.pth",
                  backbone="resnet50"):
         super().__init__()
         self.backbone = backbone
 
         self.classifier = None
         if backbone == 'resnet50':
-            self.classifier = Resnet50(pretrained=False, num_classes=1)
+            self.classifier = Resnet50()
         else:
             raise NotImplementedError(f"Backbone {backbone} not supported!")
 
@@ -56,7 +56,8 @@ class Dire(BaseModel):
         self.use_ddim = True
 
         self.model, self.diffusion = create_model_and_diffusion(**self.model_args)
-        self.model.load_state_dict(torch.load(model_path, map_location="cpu"))
+        state_dict = torch.load(model_path, map_location="cpu")['model']
+        # self.model.load_state_dict(state_dict)
         if self.model_args["use_fp16"]:
             self.model.convert_to_fp16()
         self.model.eval()
@@ -92,7 +93,11 @@ class Dire(BaseModel):
     def forward(self, image: torch.Tensor, label: torch.Tensor, **kwargs):
         label = label.float()
 
-        dire = self.compute_dire_value(image)
-        data_dict = self.classifier(dire, label)
+        if kwargs.get('dire') is not None:
+            dire = kwargs['dire']
+        else:
+            dire = self.compute_dire_value(image)
+
+        data_dict = self.classifier(dire, label=label)
 
         return data_dict

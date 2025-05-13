@@ -32,7 +32,11 @@ class Mask2LabelWrapper(BaseModel):
             edge_mask = kwargs['edge_mask']
         label = label.float()
         if self.name in ['IML_ViT', 'Mesorch', 'Cat_Net']:
-            features = self.base_model.forward_features(image=image, mask=mask, edge_mask=edge_mask, label=label)
+            if self.name == 'Cat_Net':
+                features = self.base_model.forward_features(image=image, mask=mask, edge_mask=edge_mask, label=label,
+                                                            DCT_coef=kwargs['DCT_coef'], qtables=kwargs['qtables'])
+            else:
+                features = self.base_model.forward_features(image=image, mask=mask, edge_mask=edge_mask, label=label)
             if type(features) == tuple:
                 features = features[0]
             pred_label = self.head(features)

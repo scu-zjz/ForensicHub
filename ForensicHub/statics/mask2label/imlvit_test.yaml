@@ -3,7 +3,7 @@ gpus: "4,5"
 flag: test
 
 # Log
-log_dir: "./log/aigc/aigc_univfd_df_test"
+log_dir: "./log/aigc/mask2label_imlvit_df_test"
 
 # Task
 if_predict_label: true
@@ -11,9 +11,17 @@ if_predict_mask: false
 
 no_model_eval: false
 
+checkpoint_path: /mnt/data1/dubo/workspace/ForensicHub/log/mask2label_df/mask2label_imlvit_df_train
+test_batch_size: 32
+
 # Model
 model:
-  name: UnivFD
+  name: Mask2LabelWrapper
+  init_config:
+    name: IML_ViT
+    init_config:
+      edge_lambda: 20
+      vit_pretrain_path: /mnt/data1/xuekang/workspace/IMDLBenCotest/mae_pretrain_vit_base.pth
 
 #  Test dataset (one or many)
 test_dataset:
@@ -132,7 +140,7 @@ test_dataset:
 transform:
   name: AIGCTransform
   init_config:
-    norm_type: clip
+    norm_type: image_net
 
 # Evaluators
 evaluator:
@@ -143,9 +151,6 @@ evaluator:
   - name: ImageTNR
   - name: ImageTPR
   - name: ImageAccuracy
-
-checkpoint_path: /mnt/data1/dubo/workspace/ForensicHub/log/aigc_df/aigc_univfd_df_train
-test_batch_size: 64
 
 # Device
 device: "cuda"
