@@ -28,7 +28,9 @@ state-of-the-art image forensic models.
 Evaluators cover commonly used image- and pixel-level metrics for different tasks, and are implemented with GPU
 acceleration to improve evaluation efficiency during training and testing.
 
-[](./images/overview.png)
+
+![](./images/overview.png)
+
 
 ## Installation
 
