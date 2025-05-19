@@ -166,6 +166,20 @@ dist_url: "env://"
 配置Yaml文件后，可以通过`statics/run.sh`修改文件路径后启动，也可以通过`statics/batch_run.sh`批量启动。后者是直接通过批量调用前者脚本实现。测试的Yaml配置同理，同样仅需配置四个组件，具体请见`statics`下的脚本。
 
 
+## Citation
+
+```
+@misc{du2025forensichubunifiedbenchmark,
+      title={ForensicHub: A Unified Benchmark & Codebase for All-Domain Fake Image Detection and Localization}, 
+      author={Bo Du and Xuekang Zhu and Xiaochen Ma and Chenfan Qu and Kaiwen Feng and Zhe Yang and Chi-Man Pun and Jian Liu and Jizhe Zhou},
+      year={2025},
+      eprint={2505.11003},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2505.11003}, 
+}
+```
+
 [//]: # (## 开发用链接：)
 
 [//]: # (- [文档Github仓库]&#40;https://github.com/scu-zjz/ForensicHub-doc&#41;)
