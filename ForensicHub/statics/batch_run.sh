@@ -2,16 +2,7 @@
 
 # 存放多个配置文件路径的列表
 yaml_list=(
-  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/aigc/dualnet_test.yaml"
-  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/aigc/hifinet_test.yaml"
-  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/aigc/synthbuster_test.yaml"
-  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/aigc/univfd_test.yaml"
-  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/mask2label/catnet_test.yaml"
-  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/mask2label/imlvit_test.yaml"
-  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/mask2label/mesorch_test.yaml"
-  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/mask2label/mvss_test.yaml"
-  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/mask2label/pscc_test.yaml"
-  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/mask2label/trufor_test.yaml"
+  "/mnt/data1/dubo/workspace/ForensicHub/ForensicHub/statics/aigc/dire_test.yaml"
   # 继续添加更多 YAML 路径
 )
 
