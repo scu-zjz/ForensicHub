@@ -30,7 +30,7 @@ acceleration to improve evaluation efficiency during training and testing.
 
 ![](./images/overview.png)
 
-## 📁 项目核心结构
+## 📁 Project Structure Overview
 
 ```bash
 ForensicHub/
