@@ -114,14 +114,16 @@ image of real and generated:
 2. Component Preparation
 
 In this example, the **Model** is ResNet50, which is already registered in `/common/backbones/resnet.py`, so no extra
-code is needed. **Transform** is also pre-registered and available in `/tasks/aigc/transforms/aigc_transforms.py`, providing basic
+code is needed. **Transform** is also pre-registered and available in `/tasks/aigc/transforms/aigc_transforms.py`,
+providing basic
 augmentations and ImageNet-standard normalization.
 
 3. YAML Config & Training
 
 ForensicHub supports lightweight configuration via YAML files. In this example, aside from data preparation, no
 additional code is required.
-Here is a sample training YAML `/statics/aigc/resnet_train.yaml`. The four components-**Model, Dataset, Transform, Evaluator**-are all initiated
+Here is a sample training YAML `/statics/aigc/resnet_train.yaml`. The four components-**Model, Dataset, Transform,
+Evaluator**-are all initiated
 via `init_config`：
 
 ```
@@ -210,9 +212,8 @@ dist_url: "env://"
 ```
 
 After creating the YAML file, you can launch training using `statics/run.sh` after updating file paths. You can also
-use`statics/batch_run.sh`
-for batch experiments, which internally invokes multiple `run.sh` scripts. Testing works similarly and only requires
-configuring the same four components.
+use `statics/batch_run.sh` for batch experiments, which internally invokes multiple `run.sh` scripts. Testing works
+similarly and only requires configuring the same four components.
 
 
 
