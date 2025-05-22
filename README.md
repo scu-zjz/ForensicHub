@@ -34,39 +34,45 @@ acceleration to improve evaluation efficiency during training and testing.
 
 ```bash
 ForensicHub/
-├── common/                 # 基本模块
-│   ├── backbones/          # backbones和feature extractors
-│   ├── evalaution/         # image-, pixel-level evaluators
-│   ├── utils/              # 工具包
-│   └── wrapper/            # 提供封装dataset、model等wrapper
-├── core/                   # 核心模块，提供各组件抽象基类
-├── statics/                # 存放训练和测试启用yaml配置文件
-├── tasks/                  # 实现各任务不同组件
+├── common/                 # Common modules
+│   ├── backbones/          # Backbones and feature extractors
+│   ├── evalaution/         # Image- and pixel-level evaluators
+│   ├── utils/              # Utilities
+│   └── wrapper/            # Wrappers for dataset, model, etc.
+├── core/                   # Core module providing abstract base classes
+├── statics/                # YAML configuration files for training and testing
+├── tasks/                  # Components for different sub-tasks
 │   ├── aigc/           
 │   ├── deepfake/             
 │   ├── document/            
 │   └── imdl/     
-└── training_scripts        # 模型训练和测试
+└── training_scripts        # Scripts for training and evaluation
 ```
 
 ## Installation
 
 ---
 
-我们提供两种方式使用ForensicHub，通过Python Package安装，或者通过Clone项目到本地。
+We provide two ways to use ForensicHub: install via Python package or clone the project locally.
 
 ### Python Package
+
 With `pip` :
+
 ```
 TBD
 ```
+
 With `conda` :
+
 ```
 TBD
 ```
 
 ### Clone
-直接命令行输入：
+
+Simply run the following command:
+
 ```
 git clone https://github.com/scu-zjz/ForensicHub.git
 ```
@@ -75,9 +81,49 @@ git clone https://github.com/scu-zjz/ForensicHub.git
 
 ---
 
-我们提供的Quick Start是基于Clone项目到本地的运行方式。ForensicHub是一个模块化和配置化的轻代码框架，因此您只需要使用框架现有的或者自定义自己的**Dataset,Transform and Model**并注册，然后直接通过Yaml配置文件运行。下面提供Yaml配置文件的具体信息，如何注册您自己的**Dataset,Transform and Model**组件可以在文档中找到。
+The Quick Start example is based on the local clone setup. ForensicHub is a modular and configuration-driven lightweight
+framework. You only need to use the built-in or custom Dataset, Transform, and Model components, register them, and then
+launch the pipeline using a YAML configuration file.
 
-训练阶段Yaml，其中**Model, Dataset, Transform, Evaluator**四个组件均可以实现用`init_config`方式配置类的初始化参数：
+<details>
+<summary>Training on the DiffusionForensics dataset using Resnet for AIGC</summary>
+
+1. Dataset Preparation
+
+Download the DiffusionForensics dataset from (https://github.com/ZhendongWang6/DIRE).
+The experiment only uses the ImageNet portion. Format the data as JSON. ForensicHub does not restrict how the dataset is
+loaded—just make sure the Dataset returns fields as defined in `\core\base_dataset.py` This means users are free to
+implement their own loading logic. In this case, we
+use `/tasks/aigc/datasets/label_dataset.py`, which expects a JSON with entries like with label of 0 and 1 representing a
+image of real and generated:
+
+```
+[
+  {
+    "path": "/mnt/data3/public_datasets/AIGC/DiffusionForensics/images/train/imagenet/real/n03982430/ILSVRC2012_val_00039791.JPEG",
+    "label": 0
+  },
+  {
+    "path": "/mnt/data3/public_datasets/AIGC/DiffusionForensics/images/train/imagenet/real/n03982430/ILSVRC2012_val_00022594.JPEG",
+    "label": 0
+  },
+  ...
+]
+```
+
+2. Component Preparation
+
+In this example, the **Model** is ResNet50, which is already registered in `/common/backbones/resnet.py`, so no extra
+code is needed.。 **Transform**is also pre-registered and available in `/tasks/aigc/transforms/aigc_transforms.py`, providing basic
+augmentations and ImageNet-standard normalization.
+
+3. YAML Config & Training
+
+ForensicHub supports lightweight configuration via YAML files. In this example, aside from data preparation, no
+additional code is required.
+Here is a sample training YAML `/statics/aigc/resnet_train.yaml`. The four components-**Model, Dataset, Transform, Evaluator**-are all initiated
+via `init_config`：
+
 ```
 # DDP
 gpus: "4,5"
@@ -163,8 +209,14 @@ dist_on_itp: false
 dist_url: "env://"
 ```
 
-配置Yaml文件后，可以通过`statics/run.sh`修改文件路径后启动，也可以通过`statics/batch_run.sh`批量启动。后者是直接通过批量调用前者脚本实现。测试的Yaml配置同理，同样仅需配置四个组件，具体请见`statics`下的脚本。
+After creating the YAML file, you can launch training using `statics/run.sh` after updating file paths. You can also
+use`statics/batch_run.sh`
+for batch experiments, which internally invokes multiple `run.sh` scripts. Testing works similarly and only requires
+configuring the same four components.
 
+
+
+</details>
 
 ## Citation
 
@@ -179,121 +231,3 @@ dist_url: "env://"
       url={https://arxiv.org/abs/2505.11003}, 
 }
 ```
-
-[//]: # (## 开发用链接：)
-
-[//]: # (- [文档Github仓库]&#40;https://github.com/scu-zjz/ForensicHub-doc&#41;)
-
-[//]: # (- [文档的主页]&#40;https://scu-zjz.github.io/ForensicHub-doc/&#41;)
-
-[//]: # (- [PyPi]&#40;https://pypi.org/project/forensichub/&#41;)
-
-[//]: # (## Reference链接)
-
-[//]: # (- [DeepfakeBench原生仓库]&#40;https://github.com/SCLBD/DeepfakeBench&#41;)
-
-[//]: # (- [DeepfakeBench我们版本]&#40;https://github.com/scu-zjz/DeepfakeBench&#41;)
-
-[//]: # (- [AIGCBench]&#40;https://github.com/Ekko-zn/AIGCDetectBenchmark?tab=readme-ov-file&#41;)
-
-[//]: # ()
-
-[//]: # (## Local install)
-
-[//]: # (本地开发者安装（实时更新）)
-
-[//]: # (需要先切换到clone下来的ForensicHub的路径下，然后执行如下命令)
-
-[//]: # (```shell)
-
-[//]: # (pip install -e .)
-
-[//]: # (```)
-
-[//]: # (目前pypi仅仅用于站坑，暂时不要从pypi直接安装。)
-
-[//]: # ()
-
-[//]: # (## One-line Training/testing)
-
-[//]: # (```)
-
-[//]: # (forhub train /mnt/data0/xiaochen/workspace/fornhub/ForensicHub/ForensicHub/statics/aigc/train_resnet.yaml)
-
-[//]: # (```)
-
-[//]: # ()
-
-[//]: # (```)
-
-[//]: # (forhub test /mnt/data0/xiaochen/workspace/fornhub/ForensicHub/ForensicHub/statics/aigc/test_resnet.yaml)
-
-[//]: # (```)
-
-[//]: # ()
-
-[//]: # (## IMDLBenCo式的代码生成和Training)
-
-[//]: # (找一个干净的工作路径，然后执行如下指令：)
-
-[//]: # (```)
-
-[//]: # (forhub init)
-
-[//]: # (```)
-
-[//]: # ()
-
-[//]: # (这样就会在这个路径下生成所需的yaml和shell脚本，其中`run.sh`作为全局入口，这个模式鼓励任意修改代码。)
-
-[//]: # ()
-
-[//]: # (后续可能会添加`forhub init imdl` `forhub init aigc`这样的分支入口应对不同的情况。)
-
-[//]: # ()
-
-[//]: # (## Command Line)
-
-[//]: # (查看版本)
-
-[//]: # (```)
-
-[//]: # (forhub -v )
-
-[//]: # (```)
-
-[//]: # ()
-
-[//]: # (初始化（目前没有实现功能）：)
-
-[//]: # (```)
-
-[//]: # (forhub init)
-
-[//]: # (```)
-
-[//]: # ()
-
-[//]: # ()
-
-[//]: # (## TODO list)
-
-[//]: # (- [ ] 完善文档)
-
-[//]: # (- [ ] 确定所有CMD的功能和接口API形式)
-
-[//]: # (- [ ] 缝合朱哥的Deepfake部分)
-
-[//]: # (- [ ] 测试image-level的F1分数。)
-
-[//]: # ()
-
-[//]: # (## Repo Structure:)
-
-[//]: # (- common # 通用组件)
-
-[//]: # (- core # 核心组件，用户接入时需要继承base_dataset,base_model,base_transform三个组件并注册，用户需要自己保证使用的dataset输出与model的输入对应)
-
-[//]: # (- tasks # 不同垂类任务的组件库)
-
-[//]: # (- training_scripts # 训练和测试入口，以yaml格式配置管理，统一入口为run.sh)
