@@ -91,8 +91,8 @@ launch the pipeline using a YAML configuration file.
 1. Dataset Preparation
 
 Download the DiffusionForensics dataset from (https://github.com/ZhendongWang6/DIRE).
-The experiment only uses the ImageNet portion. Format the data as JSON. ForensicHub does not restrict how the dataset is
-loaded—just make sure the Dataset returns fields as defined in `\core\base_dataset.py` This means users are free to
+The experiment only uses the ImageNet portion. Format the data as JSON. ForensicHub does not restrict how the data is
+loaded—just make sure the Dataset returns fields as defined in `\core\base_dataset.py`. This means users are free to
 implement their own loading logic. In this case, we
 use `/tasks/aigc/datasets/label_dataset.py`, which expects a JSON with entries like with label of 0 and 1 representing a
 image of real and generated:
