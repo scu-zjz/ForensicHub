@@ -114,7 +114,7 @@ image of real and generated:
 2. Component Preparation
 
 In this example, the **Model** is ResNet50, which is already registered in `/common/backbones/resnet.py`, so no extra
-code is needed.。 **Transform**is also pre-registered and available in `/tasks/aigc/transforms/aigc_transforms.py`, providing basic
+code is needed. **Transform** is also pre-registered and available in `/tasks/aigc/transforms/aigc_transforms.py`, providing basic
 augmentations and ImageNet-standard normalization.
 
 3. YAML Config & Training
