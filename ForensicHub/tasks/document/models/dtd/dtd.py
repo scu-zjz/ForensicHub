@@ -508,14 +508,14 @@ class DTD(BaseModel):
         ce_loss = F.cross_entropy(pred, gt) + self.dice(pred, gt) if self.use_dice_loss else F.cross_entropy(pred, gt)
         return ce_loss, pred
 
-    def forward(self, image, dct, qt, mask, **kwargs):
+    def forward(self, image, DCT_coef, qtables, mask, **kwargs):
         x = image
         mask = mask.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]
-        dct = dct.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]
-        if len(qt.shape) == 3:
-            qt = qt.unsqueeze(1)
+        DCT_coef = DCT_coef.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]
+        if len(qtables.shape) == 3:
+            qtables = qtables.unsqueeze(1)
         features = self.vph.forward_features(self.addcoords(x), end_index=2)
-        features[1] = self.FU(torch.cat((features[1], self.fph(dct, qt)), 1))
+        features[1] = self.FU(torch.cat((features[1], self.fph(DCT_coef, qtables)), 1))
         rst = self.swin.layers[0](features[1].flatten(2).transpose(1, 2).contiguous())
         N, L, C = rst.shape
         H = W = int(L ** (1 / 2))
@@ -525,9 +525,11 @@ class DTD(BaseModel):
         decoder_output = self.decoder(*features)
         output = self.head(decoder_output)
         seg_loss, output = self.cal_seg_loss(output, mask)
+        output = F.softmax(output, dim=1)
+        output = output[:, 1:]
         output_dict = {
             "backward_loss": seg_loss,
-            "pred_mask": output.sigmoid(),
+            "pred_mask": output,
             "visual_loss": {
                 "seg_loss": seg_loss,
                 "combined_loss": seg_loss

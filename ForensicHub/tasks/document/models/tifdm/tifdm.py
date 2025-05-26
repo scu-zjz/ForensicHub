@@ -233,6 +233,7 @@ class Tifdm(BaseModel):
         pred1 = self.decoder(out2h, out3h, out4h, out5v)
         output = self.linearp(pred1)
         seg_loss, output = self.cal_seg_loss(output, mask)
+        output = F.softmax(output,dim=1)[:,1:]
         output_dict = {
             "backward_loss": seg_loss,
             "pred_mask": output,
