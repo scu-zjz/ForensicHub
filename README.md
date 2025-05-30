@@ -8,9 +8,9 @@ forensic models or building your own cross-domain pipelines, **ForensicHub** off
 architecture to streamline development, comparison, and analysis.
 
 ******
-[![Arxiv](https://img.shields.io/badge/arXiv-2406.10580-b31b1b.svg?logo=arxiv)](https://arxiv.org/abs/2505.11003)
+[![Arxiv](https://img.shields.io/badge/arXiv-2505.11003-b31b1b.svg?logo=arxiv)](https://arxiv.org/abs/2505.11003)
 [![Documents](https://img.shields.io/badge/Documents-Click_here-brightgreen?logo=read-the-docs)](https://scu-zjz.github.io/ForensicHub-doc/)
-![license](https://img.shields.io/github/license/scu-zjz/IMDLBenCo?logo=license)
+![license](https://img.shields.io/github/license/scu-zjz/ForensicHub?logo=license)
 <!----
 [![Ask Me Anything!](https://img.shields.io/badge/Official%20-Yes-1abc9c.svg)](https://GitHub.com/scu-zjz/) 
 ---->
