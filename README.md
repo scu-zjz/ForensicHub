@@ -1,11 +1,18 @@
+<p align="center" width="100%">
+<img src="images/logo.jpg" alt="OSQ" style="width: 28%; min-width: 150px; display: block; margin: auto;">
+</p>
+
 # ForensicHub: A Unified Benchmark & Codebase for All-Domain Fake Image Detection and Localization
 
-**ForensicHub** is the go-to benchmark and modular codebase for all-domain fake image detection and localization,
-covering deepfake detection (Deepfake), image manipulation detection and localization (IMDL), artificial
-intelligence-generated image detection (AIGC), and document image manipulation localization (Doc). Whether you're
-benchmarking
-forensic models or building your own cross-domain pipelines, **ForensicHub** offers a flexible, configuration-driven
-architecture to streamline development, comparison, and analysis.
+<div align="center">
+
+Bo Du†, Xuekang Zhu†, Xiaochen Ma†, Chenfan Qu†, Kaiwen Feng†, Zhe Yang, Chi-Man Pun, Jian Liu*, [Jizhe Zhou](https://knightzjz.github.io/) *
+
+</div>  
+<div align="center"><span style="font-size: smaller;">
+<br>†: joint first author & equal contribution
+*: corresponding author</br>  
+</div>  
 
 ******
 [![Arxiv](https://img.shields.io/badge/arXiv-2505.11003-b31b1b.svg?logo=arxiv)](https://arxiv.org/abs/2505.11003)
@@ -14,6 +21,14 @@ architecture to streamline development, comparison, and analysis.
 <!----
 [![Ask Me Anything!](https://img.shields.io/badge/Official%20-Yes-1abc9c.svg)](https://GitHub.com/scu-zjz/) 
 ---->
+
+**ForensicHub** is the go-to benchmark and modular codebase for all-domain fake image detection and localization,
+covering deepfake detection (Deepfake), image manipulation detection and localization (IMDL), artificial
+intelligence-generated image detection (AIGC), and document image manipulation localization (Doc). Whether you're
+benchmarking
+forensic models or building your own cross-domain pipelines, **ForensicHub** offers a flexible, configuration-driven
+architecture to streamline development, comparison, and analysis.
+
 
 
 🕵️‍♂️ **ForensicHub provides four core modular components:**
