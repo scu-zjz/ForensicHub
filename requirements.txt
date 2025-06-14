@@ -1,1 +1,14 @@
 imdlbenco
+rich
+fvcore
+albumentations==1.3.0
+matplotlib
+numpy<2
+scikit_learn
+timm
+fvcore
+tensorboard
+grad_cam
+ttach
+appdirs
+colorama

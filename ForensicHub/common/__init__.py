@@ -4,5 +4,9 @@ from .backbones.convnext import *
 from .backbones.swintransformer import *
 from .backbones.efficientnet import *
 from .backbones.xception import *
+from .backbones.unet import *
+from .backbones.mobilenet import *
+from .backbones.vit import *
+from .backbones.densenet import *
 from .wrapper.mask2labelwrapper import Mask2LabelWrapper
 from .wrapper.crossdatasetwrapper import CrossDataset
