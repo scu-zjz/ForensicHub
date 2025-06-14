@@ -6,7 +6,7 @@
 
 <div align="center">
 
-Bo Du†, Xuekang Zhu†, Xiaochen Ma†, Chenfan Qu†, Kaiwen Feng†, Zhe Yang, Chi-Man Pun, Jian Liu *, [Jizhe Zhou](https://knightzjz.github.io/) *
+Bo Du†, Xuekang Zhu†, Xiaochen Ma†, Chenfan Qu†, Kaiwen Feng†, Zhe Yang, Chi-Man Pun, Jian Liu*, [Jizhe Zhou](https://knightzjz.github.io/) *
 
 </div>  
 <div align="center"><span style="font-size: smaller;">
