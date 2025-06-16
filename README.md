@@ -144,7 +144,7 @@ Here is a sample training YAML `/statics/aigc/resnet_train.yaml`. The four compo
 Evaluator**-are all initiated
 via `init_config`：
 
-```
+```shell
 # DDP
 gpus: "4,5"
 flag: train
