@@ -84,13 +84,7 @@ We provide two ways to use ForensicHub: install via Python package or clone the 
 With `pip` :
 
 ```
-TBD
-```
-
-With `conda` :
-
-```
-TBD
+pip install forensichub
 ```
 
 ### Clone
