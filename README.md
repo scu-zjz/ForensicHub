@@ -21,12 +21,12 @@ Bo Du†, Xuekang Zhu†, Xiaochen Ma†, Chenfan Qu†, Kaiwen Feng†, Zhe Yan
 <!----
 [![Ask Me Anything!](https://img.shields.io/badge/Official%20-Yes-1abc9c.svg)](https://GitHub.com/scu-zjz/) 
 ---->
+🙋‍♂️Welcome to **ForensicHub**!   
 
-**ForensicHub** is the go-to benchmark and modular codebase for all-domain fake image detection and localization,
+ForensicHub is the go-to benchmark and modular codebase for all-domain fake image detection and localization,
 covering deepfake detection (Deepfake), image manipulation detection and localization (IMDL), artificial
 intelligence-generated image detection (AIGC), and document image manipulation localization (Doc). Whether you're
-benchmarking
-forensic models or building your own cross-domain pipelines, **ForensicHub** offers a flexible, configuration-driven
+benchmarking forensic models or building your own cross-domain pipelines, **ForensicHub** offers a flexible, configuration-driven
 architecture to streamline development, comparison, and analysis.
 
 
@@ -73,7 +73,7 @@ ForensicHub/
 └── training_scripts        # Scripts for training and evaluation
 ```
 
-## Installation
+## 📀Installation
 
 ---
 
@@ -87,7 +87,7 @@ With `pip` :
 pip install forensichub
 ```
 
-### Clone
+### 📉Clone
 
 Simply run the following command:
 
@@ -95,7 +95,7 @@ Simply run the following command:
 git clone https://github.com/scu-zjz/ForensicHub.git
 ```
 
-## Quick Start
+## 🎯Quick Start
 
 ---
 
@@ -237,14 +237,15 @@ similarly and only requires configuring the same four components.
 
 </details>
 
-## Update
+## 🚤Update
 - [2025.6.16] Add detailed installation and YAML configuration, see [Document](https://scu-zjz.github.io/ForensicHub-doc/zh/guide/quickstart/0_install.html).
 - [2025.6.14] Add four new backbones: UNet, ViT, MobileNet, and DenseNet. More backbones are ongoing!
 
-## About
-**About the Developers:**  
-- ForensicHub's joint project leader/supervisor is Associate Professor [_Jizhe Zhou_ (周吉喆)](https://knightzjz.github.io/), Sichuan University, and Jian Liu（刘健）, Ant Group.
-- ForensicHub is sponsored and advised by Prof. _Chi-Man PUN_ (潘治文), University of Macau.
+## 👨‍💻About
+☑️**About the Developers:**  
+- ForensicHub's project leader/supervisor is Associate Professor 🏀[_Jizhe Zhou_ (周吉喆)](https://knightzjz.github.io/), Sichuan University🇨🇳, and _Jian Liu_ (刘健), the Leader of the Computer Vision Algorithm Research Group, Ant Group Company Ltd.   
+- ForensicHub's codebase designer and coding leader is [_Bo Du_ (杜博)](https://github.com/dddb11), Sichuan University🇨🇳.  
+- ForensicHub is jointly sponsored and advised by Prof. _Jiancheng LV_ (吕建成), Sichuan University 🐼, and Prof. _Chi-Man PUN_ (潘治文), University of Macau 🇲🇴, through the [Research Center of Machine Learning and Industry Intelligence, China MOE](https://center.dicalab.cn/) platform.  
 
 
 ## Citation
