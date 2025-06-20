@@ -6,13 +6,15 @@
 
 <div align="center">
 
-[Bo Du](https://github.com/dddb11)†, Xuekang Zhu†, [Xiaochen Ma](https://ma.xiaochen.world/)†, Chenfan Qu†, Kaiwen Feng†, Zhe Yang, [Chi-Man Pun](https://cmpun.github.io/), Jian Liu*, [Jizhe Zhou](https://knightzjz.github.io/)*
+[Bo Du](https://github.com/dddb11)†,    [Xuekang Zhu](https://github.com/Inkyl)†, [Xiaochen Ma](https://ma.xiaochen.world/)†,    Chenfan Qu†, Kaiwen Feng†, Zhe Yang  
+[Chi-Man Pun](https://cmpun.github.io/),    Jian Liu*, [Jizhe Zhou](https://knightzjz.github.io/)*   
 
-</div>  
 <div align="center"><span style="font-size: smaller;">
 <br>†: joint first author & equal contribution
 *: corresponding author</br>  
 </div>  
+</div>
+
 
 ******
 [![Arxiv](https://img.shields.io/badge/arXiv-2505.11003-b31b1b.svg?logo=arxiv)](https://arxiv.org/abs/2505.11003)
