@@ -240,7 +240,7 @@ similarly and only requires configuring the same four components.
 </details>
 
 ## 🚤Update
-- [2025.7.1] Add document of Data Preparation & JSON Generation and Running Training & Evaluation in ForensicHub, see [Document](http://localhost:8080/ForensicHub-doc/guide/quickstart/3_data_preparation.html) and [Document](http://localhost:8080/ForensicHub-doc/guide/quickstart/4_Running_Evaluation.html).
+- [2025.7.1] Add document of Data Preparation & JSON Generation and Running Training & Evaluation in ForensicHub, see [Data Preparation](https://scu-zjz.github.io/ForensicHub-doc/guide/quickstart/3_data_preparation.html) and [Running Evaluation](https://scu-zjz.github.io/ForensicHub-doc/guide/quickstart/4_Running_Evaluation.html).
 - [2025.6.22] Add summary of models and evaluators in ForensicHub, see [Document](https://scu-zjz.github.io/ForensicHub-doc/zh/summary/model.html).
 - [2025.6.16] Add detailed installation and YAML configuration, see [Document](https://scu-zjz.github.io/ForensicHub-doc/zh/guide/quickstart/0_install.html).
 - [2025.6.14] Add four new backbones: UNet, ViT, MobileNet, and DenseNet. More backbones are ongoing!
