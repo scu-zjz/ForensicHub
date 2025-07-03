@@ -31,9 +31,22 @@ intelligence-generated image detection (AIGC), and document image manipulation l
 benchmarking forensic models or building your own cross-domain pipelines, **ForensicHub** offers a flexible, configuration-driven
 architecture to streamline development, comparison, and analysis.
 
+## 🚤Update
+- [2025.7.1] Add document of Data Preparation & JSON Generation and Running Training & Evaluation in ForensicHub, see [Data Preparation](https://scu-zjz.github.io/ForensicHub-doc/guide/quickstart/3_data_preparation.html) and [Running Evaluation](https://scu-zjz.github.io/ForensicHub-doc/guide/quickstart/4_Running_Evaluation.html).
+- [2025.6.22] Add summary of models and evaluators in ForensicHub, see [Document](https://scu-zjz.github.io/ForensicHub-doc/zh/summary/model.html).
+- [2025.6.16] Add detailed installation and YAML configuration, see [Document](https://scu-zjz.github.io/ForensicHub-doc/zh/guide/quickstart/0_install.html).
+- [2025.6.14] Add four new backbones: UNet, ViT, MobileNet, and DenseNet. More backbones are ongoing!
 
 
-🕵️‍♂️ **ForensicHub provides four core modular components:**
+## 👨‍💻About
+☑️**About the Developers:**  
+- ForensicHub's project leader/supervisor is Associate Professor 🏀[_Jizhe Zhou_ (周吉喆)](https://knightzjz.github.io/), Sichuan University🇨🇳, and _Jian Liu_ (刘健), the Leader of the Computer Vision Algorithm Research Group, Ant Group Company Ltd.   
+- ForensicHub's codebase designer and coding leader is [_Bo Du_ (杜博)](https://github.com/dddb11), Sichuan University🇨🇳.  
+- ForensicHub is jointly sponsored and advised by Prof. _Jiancheng LV_ (吕建成), Sichuan University 🐼, and Prof. _Chi-Man PUN_ (潘治文), University of Macau 🇲🇴, through the [Research Center of Machine Learning and Industry Intelligence, China MOE](https://center.dicalab.cn/) platform.  
+
+
+## 🕵️‍♂️ Architecture   
+**ForensicHub provides four core modular components:** 
 
 ### 🗂️ Datasets
 
@@ -239,17 +252,8 @@ similarly and only requires configuring the same four components.
 
 </details>
 
-## 🚤Update
-- [2025.7.1] Add document of Data Preparation & JSON Generation and Running Training & Evaluation in ForensicHub, see [Data Preparation](https://scu-zjz.github.io/ForensicHub-doc/guide/quickstart/3_data_preparation.html) and [Running Evaluation](https://scu-zjz.github.io/ForensicHub-doc/guide/quickstart/4_Running_Evaluation.html).
-- [2025.6.22] Add summary of models and evaluators in ForensicHub, see [Document](https://scu-zjz.github.io/ForensicHub-doc/zh/summary/model.html).
-- [2025.6.16] Add detailed installation and YAML configuration, see [Document](https://scu-zjz.github.io/ForensicHub-doc/zh/guide/quickstart/0_install.html).
-- [2025.6.14] Add four new backbones: UNet, ViT, MobileNet, and DenseNet. More backbones are ongoing!
 
-## 👨‍💻About
-☑️**About the Developers:**  
-- ForensicHub's project leader/supervisor is Associate Professor 🏀[_Jizhe Zhou_ (周吉喆)](https://knightzjz.github.io/), Sichuan University🇨🇳, and _Jian Liu_ (刘健), the Leader of the Computer Vision Algorithm Research Group, Ant Group Company Ltd.   
-- ForensicHub's codebase designer and coding leader is [_Bo Du_ (杜博)](https://github.com/dddb11), Sichuan University🇨🇳.  
-- ForensicHub is jointly sponsored and advised by Prof. _Jiancheng LV_ (吕建成), Sichuan University 🐼, and Prof. _Chi-Man PUN_ (潘治文), University of Macau 🇲🇴, through the [Research Center of Machine Learning and Industry Intelligence, China MOE](https://center.dicalab.cn/) platform.  
+
 
 
 ## Citation
