@@ -6,7 +6,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 import math
-from pytorch_wavelets import DWTForward, DWTInverse
+from .pytorch_wavelets_amp.transforme2d import DWTForward, DWTInverse
 
 class Bottleneck(nn.Module):
     expansion = 4
@@ -247,6 +247,7 @@ class ForgeryAwareAdapterLayer(nn.Module):
         # print(f"nq: {nq}, bs: {bs}, md: {md}")
         # freq details
         img_patchs = x[1:].transpose(0, 1).reshape(bs, int(math.sqrt(nq)), int(math.sqrt(nq)), md).permute(0, 3, 1, 2)
+        img_patchs = img_patchs.to(torch.float32)
         dwt_img_l, dwt_img_h = self.dwt_transform(img_patchs)
         dwt_img = torch.cat([dwt_img_l[:, :, None], dwt_img_h[0]], dim=2) # torch.Size([3, 1024, 4, 8, 8])
         hh, ww = dwt_img.shape[-2:]
@@ -254,7 +255,10 @@ class ForgeryAwareAdapterLayer(nn.Module):
         dwt_img = self.dwt_norm(dwt_img).permute(0, 2, 3, 1)  # torch.Size([3, 1024, 4, 64]) -> torch.Size([3, 4, 64, 1024])
         dwt_feature = self.forward_freq(dwt_img)
         dwt_feature = dwt_feature.reshape(bs, 4, hh, ww, md).permute(0, 4, 1, 2, 3)
-        dwt_feature = self.idwt_transform((dwt_feature[:, :, 0], [dwt_feature[:, :, 1:]])).flatten(-2).permute(2, 0, 1)
+        dwt_feature_1 = dwt_feature[:, :, 0].to(torch.float32)
+        dwt_feature_2 = [i.to(torch.float32) for i in [dwt_feature[:, :, 1:]]]
+        dwt_feature = self.idwt_transform((dwt_feature_1, dwt_feature_2)).flatten(-2).permute(2, 0, 1)
+        # dwt_feature = self.idwt_transform((dwt_feature[:, :, 0], [dwt_feature[:, :, 1:]])).flatten(-2).permute(2, 0, 1)
         dwt_feature = torch.cat([torch.zeros_like(x[:1]), dwt_feature], dim=0)
 
         # img details

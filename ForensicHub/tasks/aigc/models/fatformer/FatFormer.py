@@ -5,6 +5,7 @@ from .clip_models import TextEncoder, LanguageGuidedAlignment
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
+import argparse
 
 from ForensicHub.core.base_model import BaseModel
 from ForensicHub.registry import register_model
@@ -27,9 +28,37 @@ VALID_NAMES = [
     'ViT-L/14', 
 ]
 
+def get_args_parser():
+    parser = argparse.ArgumentParser(' ', add_help=True)
+    
+    parser.add_argument('--backbone', type=str, default="ViT-B/16")
+    parser.add_argument('--device', default='cpu', type=str,
+                        help='device to use for training / testing')
+    parser.add_argument('--num_classes', type=int, default=2)
+    parser.add_argument('--num_vit_adapter', type=int, default=3)
+
+    # text encoder
+    parser.add_argument('--num_context_embedding', type=int, default=8)
+    parser.add_argument('--init_context_embedding', type=str, default="")
+
+    # frequency
+    parser.add_argument('--hidden_dim', type=int, default=768)
+    parser.add_argument('--d_model', type=int, default=768)
+    parser.add_argument('--frequency_encoder_layer', type=int, default=2)
+    parser.add_argument('--decoder_layer', type=int, default=4)
+    parser.add_argument('--num_heads', type=int, default=8)
+    
+    args, remaining_args = parser.parse_known_args()
+    # 获取对应的模型类
+    # model_class = MODELS.get(args.model)
+
+    return args
+base_args = get_args_parser()
+
+loss_fn = nn.CrossEntropyLoss()
 @register_model("FatFormer")
 class FatFormer(BaseModel):
-    def __init__(self, args=None):
+    def __init__(self, args=base_args):
         super(FatFormer, self).__init__()
         # init backbone with forgery-aware adapter
         
@@ -63,7 +92,7 @@ class FatFormer(BaseModel):
         tgt = self.norm2(tgt)
         return tgt
 
-    def forward(self, image):
+    def forward(self, image, label, **kwargs):
         tokenized_prompts = self.tokenized_prompts
         logit_scale = self.logit_scale.exp()
 
@@ -82,7 +111,6 @@ class FatFormer(BaseModel):
             l_i = logit_scale * imf_i[0] @ text_features_norm.t()
             logits.append(l_i)
         logits = torch.stack(logits)
-
         # Eq.(9)
         # text-guided interactor
         text_features = torch.stack(text_feature_list, dim=1)
@@ -99,5 +127,15 @@ class FatFormer(BaseModel):
         for pts_i, imf_i in zip(aug_image_features, text_features_norm.transpose(0, 1)):
             aug_logits.append(logit_scale * pts_i @ imf_i.t())
         aug_logits = torch.stack(aug_logits)
-        
-        return logits + aug_logits
+        final_logits = logits + aug_logits
+        # final_logits = final_logits [:, 1] / final_logits.sum(dim=1)
+        combined_loss = loss_fn(final_logits, label.long())
+        pred_label = torch.softmax(logits, dim=1)[:,1]  # [B, 2]
+        dict = {
+            "backward_loss": combined_loss,
+            "pred_label": pred_label,
+            "visual_loss": {
+                "combined_loss": combined_loss
+            }
+        }
+        return dict
