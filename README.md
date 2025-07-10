@@ -32,6 +32,7 @@ benchmarking forensic models or building your own cross-domain pipelines, **Fore
 architecture to streamline development, comparison, and analysis.
 
 ## 🚤Update
+- [2025.7.10] Add a script for single image inference, see [Code](https://github.com/scu-zjz/ForensicHub/blob/master/ForensicHub/training_scripts/inference.py).
 - [2025.7.6] Add a new AIGC model, [FatFormer](https://arxiv.org/abs/2312.16649), see [Code](https://github.com/scu-zjz/ForensicHub/tree/master/ForensicHub/tasks/aigc/models/fatformer).
 - [2025.7.1] Add document of Data Preparation & JSON Generation and Running Training & Evaluation in ForensicHub, see [Data Preparation](https://scu-zjz.github.io/ForensicHub-doc/guide/quickstart/3_data_preparation.html) and [Running Evaluation](https://scu-zjz.github.io/ForensicHub-doc/guide/quickstart/4_Running_Evaluation.html).
 - [2025.6.22] Add summary of models and evaluators in ForensicHub, see [Document](https://scu-zjz.github.io/ForensicHub-doc/zh/summary/model.html).
