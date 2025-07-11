@@ -26,6 +26,8 @@ class Deepfake2ForensicWrapper(nn.Module):
 
     def forward(self, image, label, *args, **kwargs):
         data_dict = {"image": image, "label": label}
+        if "label" in data_dict:
+            data_dict["label"] = data_dict["label"].long()
         predictions = self._base_model(data_dict)
         losses = self._base_model.get_losses(data_dict, predictions)
 
