@@ -32,6 +32,7 @@ benchmarking forensic models or building your own cross-domain pipelines, **Fore
 architecture to streamline development, comparison, and analysis.
 
 ## 🚤Update
+- [2025.7.11] We update to a *lazy-load version* of MODEL and POSTFUNC. The package will be checked when the model is actually used, which reduces unnecessary package installation. 
 - [2025.7.10] Add a script for single image inference, see [Code](https://github.com/scu-zjz/ForensicHub/blob/master/ForensicHub/training_scripts/inference.py).
 - [2025.7.6] Add a new AIGC model, [FatFormer](https://arxiv.org/abs/2312.16649), see [Code](https://github.com/scu-zjz/ForensicHub/tree/master/ForensicHub/tasks/aigc/models/fatformer).
 - [2025.7.1] Add document of Data Preparation & JSON Generation and Running Training & Evaluation in ForensicHub, see [Data Preparation](https://scu-zjz.github.io/ForensicHub-doc/guide/quickstart/3_data_preparation.html) and [Running Evaluation](https://scu-zjz.github.io/ForensicHub-doc/guide/quickstart/4_Running_Evaluation.html).
@@ -94,15 +95,7 @@ ForensicHub/
 
 ---
 
-We provide two ways to use ForensicHub: install via Python package or clone the project locally.
-
-### Python Package
-
-With `pip` :
-
-```
-pip install forensichub
-```
+We recommend cloning the project locally.
 
 ### 📉Clone
 
@@ -111,6 +104,7 @@ Simply run the following command:
 ```
 git clone https://github.com/scu-zjz/ForensicHub.git
 ```
+Also, since ForensicHub is compatible with DeepfakeBench (which hasn’t been uploaded to PyPI), you’ll need to clone our forked version [Site](https://github.com/scu-zjz/DeepfakeBench) locally and install it using: `pip install -e .`.
 
 ## 🎯Quick Start
 
