@@ -6,7 +6,7 @@
 
 <div align="center">
 
-[Bo Du](https://github.com/dddb11)†,    [Xuekang Zhu](https://github.com/Inkyl)†, [Xiaochen Ma](https://ma.xiaochen.world/)†,    Chenfan Qu†, Kaiwen Feng†, Zhe Yang  
+[Bo Du](https://github.com/dddb11)†,    [Xuekang Zhu](https://github.com/Inkyl)†, [Xiaochen Ma](https://ma.xiaochen.world/)†,    [Chenfan Qu](https://github.com/qcf-568)†, Kaiwen Feng†, Zhe Yang  
 [Chi-Man Pun](https://cmpun.github.io/),    Jian Liu*, [Jizhe Zhou](https://knightzjz.github.io/)*   
 
 <div align="center"><span style="font-size: smaller;">
