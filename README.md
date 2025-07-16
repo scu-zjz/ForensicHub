@@ -41,12 +41,14 @@ architecture to streamline development, comparison, and analysis.
 - [2025.6.14] Add four new backbones: UNet, ViT, MobileNet, and DenseNet. More backbones are ongoing!
 
 
-## 👨‍💻About
+## 👨‍💻 About
 ☑️**About the Developers:**  
 - ForensicHub's project leader/supervisor is Associate Professor 🏀[_Jizhe Zhou_ (周吉喆)](https://knightzjz.github.io/), Sichuan University🇨🇳, and _Jian Liu_ (刘健), the Leader of the Computer Vision Algorithm Research Group, Ant Group Company Ltd.   
 - ForensicHub's codebase designer and coding leader is [_Bo Du_ (杜博)](https://github.com/dddb11), Sichuan University🇨🇳.  
 - ForensicHub is jointly sponsored and advised by Prof. _Jiancheng LV_ (吕建成), Sichuan University 🐼, and Prof. _Chi-Man PUN_ (潘治文), University of Macau 🇲🇴, through the [Research Center of Machine Learning and Industry Intelligence, China MOE](https://center.dicalab.cn/) platform.  
 
+## 📦 Resources
+You can find the resources of models under IFF-Protocol, including [checkpoints](https://ksefile.hpccube.com:65241/efile/s/w/d2VuZmlsZQ==_e2bbd67ff27d3691&（密码：Fzeu）请在浏览器打开链接，输入提取码下载文件?pwd=Fzeu), [training parameters](https://github.com/scu-zjz/ForensicHub/tree/master/ForensicHub/statics/crossdataset_image), and [hardware specifications](https://arxiv.org/pdf/2505.11003).
 
 ## 🕵️‍♂️ Architecture   
 **ForensicHub provides four core modular components:** 
