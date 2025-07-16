@@ -48,7 +48,7 @@ architecture to streamline development, comparison, and analysis.
 - ForensicHub is jointly sponsored and advised by Prof. _Jiancheng LV_ (吕建成), Sichuan University 🐼, and Prof. _Chi-Man PUN_ (潘治文), University of Macau 🇲🇴, through the [Research Center of Machine Learning and Industry Intelligence, China MOE](https://center.dicalab.cn/) platform.  
 
 ## 📦 Resources
-You can find the resources of models under IFF-Protocol, including [checkpoints](https://ksefile.hpccube.com:65241/efile/s/w/d2VuZmlsZQ==_e2bbd67ff27d3691&（密码：Fzeu）请在浏览器打开链接，输入提取码下载文件?pwd=Fzeu), [training parameters](https://github.com/scu-zjz/ForensicHub/tree/master/ForensicHub/statics/crossdataset_image), and [hardware specifications](https://arxiv.org/pdf/2505.11003).
+You can find the resources of models under IFF-Protocol, including [checkpoints](https://pan.baidu.com/s/1gER6MYt30ghrKQT0Nu182g?pwd=brir), [training parameters](https://github.com/scu-zjz/ForensicHub/tree/master/ForensicHub/statics/crossdataset_image), and [hardware specifications](https://arxiv.org/pdf/2505.11003).
 
 ## 🕵️‍♂️ Architecture   
 **ForensicHub provides four core modular components:** 
