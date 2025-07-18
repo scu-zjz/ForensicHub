@@ -32,6 +32,7 @@ benchmarking forensic models or building your own cross-domain pipelines, **Fore
 architecture to streamline development, comparison, and analysis.
 
 ## 🚤Update
+- [2025.7.17] Released some missing pretrain weights for DocTamper Detection models, see this [issue](https://github.com/scu-zjz/ForensicHub/issues/9) for details.
 - [2025.7.11] We update to a *lazy-load version* of MODEL and POSTFUNC. The package will be checked when the model is actually used, which reduces unnecessary package installation. 
 - [2025.7.10] Add a script for single image inference, see [Code](https://github.com/scu-zjz/ForensicHub/blob/master/ForensicHub/training_scripts/inference.py).
 - [2025.7.6] Add a new AIGC model, [FatFormer](https://arxiv.org/abs/2312.16649), see [Code](https://github.com/scu-zjz/ForensicHub/tree/master/ForensicHub/tasks/aigc/models/fatformer).
