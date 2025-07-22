@@ -51,6 +51,9 @@ architecture to streamline development, comparison, and analysis.
 ## 📦 Resources
 You can find the resources of models under IFF-Protocol, including [checkpoints](https://pan.baidu.com/s/1gER6MYt30ghrKQT0Nu182g?pwd=brir), [training parameters](https://github.com/scu-zjz/ForensicHub/tree/master/ForensicHub/statics/crossdataset_image), and [hardware specifications](https://arxiv.org/pdf/2505.11003).
 
+Checkpoints for Document Benchmark: https://pan.baidu.com/s/13ViyJebu12I0GN3BucBQrg?pwd=npkx
+Checkpoints for AIGC Benchmark: https://pan.baidu.com/s/11Jr2wjp6lAz9IBNWnbHlVg?pwd=kzhf
+
 ## 🕵️‍♂️ Architecture   
 **ForensicHub provides four core modular components:** 
 
