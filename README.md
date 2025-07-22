@@ -54,6 +54,8 @@ You can find the resources of models under IFF-Protocol, including [checkpoints]
 Checkpoints for Document Benchmark: https://pan.baidu.com/s/13ViyJebu12I0GN3BucBQrg?pwd=npkx
 Checkpoints for AIGC Benchmark: https://pan.baidu.com/s/11Jr2wjp6lAz9IBNWnbHlVg?pwd=kzhf
 
+Pretrained backbone weights for Document models: https://pan.baidu.com/s/1lsArVWzcJiADUcYYeqyClw?pwd=4gf4. Place the checkpoint under the corresponding model’s folder.
+
 ## 🕵️‍♂️ Architecture   
 **ForensicHub provides four core modular components:** 
 
