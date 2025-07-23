@@ -11,7 +11,11 @@ def getdir(path):
         os.makedirs(path)
 
 def crop_img_func(img, img_name_ori, mask=None, jpg_dct=None, crop_size=512):
-    # img, mask, jpg_dct all in shape [H, W, C]
+    # img is the RGB images loaded through the cv2.imread function, img = cv2.imread('xxx.jpg'). Type: np.array, shape: [H, W, 3].
+    # img_name_ori is the image's name. For example, for the image in path 'OSTF/OSTF_train/images/srnet_102.jpg', its image_name_ori is 'srnet_102.jpg'. Type: string.
+    # mask (optional) is the binary mask indicating the tampered region, it is loaded through the cv2.imread function, mask = cv2.imread('xxx.png', 0). Type: np.array, shape: [H, W, C].
+    # jpg_dct (optional) is the DCT_coff loaded through the jpegio.read function, dct = jpegio.read('xxx.jpg').coef_arrays[0].copy(). Type: np.array, shape: [H, W, 1].
+    # crop_size is the target size of cropped image patches. Type: int.
     if '.' in img_name_ori:
         img_name = '.'.join(img_name_ori.split('.')[:-1])
         suffix = img_name_ori.split('.')[-1]
