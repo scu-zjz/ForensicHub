@@ -27,7 +27,10 @@ def _wrap_deepfake_if_needed(cls, name):
     from ForensicHub.tasks.deepfake.wrapper.wrappers import Deepfake2ForensicWrapper
     from DeepfakeBench.training import detectors
 
+    flag = False
+
     if name in _deepfake_model_map:
+        flag = True
         cls = getattr(detectors, name)
 
         class WrappedModel(Deepfake2ForensicWrapper):
@@ -36,6 +39,6 @@ def _wrap_deepfake_if_needed(cls, name):
 
         WrappedModel.__name__ = f"Wrapped{name}"
         WrappedModel.__qualname__ = WrappedModel.__name__
-        return WrappedModel
+        return WrappedModel, flag
 
-    return cls
+    return cls, flag
