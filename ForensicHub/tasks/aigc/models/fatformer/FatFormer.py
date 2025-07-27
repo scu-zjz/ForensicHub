@@ -23,15 +23,14 @@ Forgery-aware Adaptive Transformer for Generalizable Synthetic Image Detection
 # parser.add_argument('--init_context_embedding', type=str, default="")
 _tokenizer = _Tokenizer()
 VALID_NAMES = [
-    'ViT-B/32', 
-    'ViT-B/16', 
-    'ViT-L/14', 
+    'ViT-B/32','768' 
+    'ViT-B/16','768'
+    'ViT-L/14','1024' 
 ]
 
 def get_args_parser():
     parser = argparse.ArgumentParser(' ', add_help=True)
     
-    parser.add_argument('--backbone', type=str, default="ViT-B/16")
     parser.add_argument('--device', default='cpu', type=str,
                         help='device to use for training / testing')
     parser.add_argument('--num_classes', type=int, default=2)
@@ -43,7 +42,6 @@ def get_args_parser():
 
     # frequency
     parser.add_argument('--hidden_dim', type=int, default=768)
-    parser.add_argument('--d_model', type=int, default=768)
     parser.add_argument('--frequency_encoder_layer', type=int, default=2)
     parser.add_argument('--decoder_layer', type=int, default=4)
     parser.add_argument('--num_heads', type=int, default=8)
@@ -58,11 +56,11 @@ base_args = get_args_parser()
 loss_fn = nn.CrossEntropyLoss()
 @register_model("FatFormer")
 class FatFormer(BaseModel):
-    def __init__(self, args=base_args):
+    def __init__(self, backbone="ViT-B/16", d_model=768, args=base_args):
         super(FatFormer, self).__init__()
         # init backbone with forgery-aware adapter
-        
-        self.clip_model = clip.load(args.backbone, device=args.device, args=args)[0] # self.preprecess will not be used during training, which is handled in Dataset class 
+        args.d_model=d_model
+        self.clip_model = clip.load(backbone, device=args.device, args=args)[0] # self.preprecess will not be used during training, which is handled in Dataset class
 
         # self.clip_model = clip.load(name, device=args.device, args=args)[0] # self.preprecess will not be used during training, which is handled in Dataset class 
         # init language guided alignment

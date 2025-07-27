@@ -5,6 +5,7 @@ _lazy_model_map = {
     "Synthbuster": "ForensicHub.tasks.aigc.models.synthbuster.Synthbuster",
     "UnivFD": "ForensicHub.tasks.aigc.models.univfd.UnivFD",
     "FatFormer": "ForensicHub.tasks.aigc.models.fatformer.FatFormer",
+    "CO_SPY": "ForensicHub.tasks.aigc.models.co_spy.CO_SPY",
 }
 
 _lazy_postfunc_map = {
