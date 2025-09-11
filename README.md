@@ -49,12 +49,13 @@ architecture to streamline development, comparison, and analysis.
 - ForensicHub is jointly sponsored and advised by Prof. _Jiancheng LV_ (吕建成), Sichuan University 🐼, and Prof. _Chi-Man PUN_ (潘治文), University of Macau 🇲🇴, through the [Research Center of Machine Learning and Industry Intelligence, China MOE](https://center.dicalab.cn/) platform.  
 
 ## 📦 Resources
-You can find the resources of models under IFF-Protocol, including [checkpoints](https://pan.baidu.com/s/1gER6MYt30ghrKQT0Nu182g?pwd=brir), [training parameters](https://github.com/scu-zjz/ForensicHub/tree/master/ForensicHub/statics/crossdataset_image), and [hardware specifications](https://arxiv.org/pdf/2505.11003).
+You can find the resources of models under IFF-Protocol, including [checkpoints](https://pan.baidu.com/s/1gER6MYt30ghrKQT0Nu182g?pwd=brir) (or [onedrive](https://1drv.ms/f/c/090693aab65eb63b/Eo6tl6ktl4BLkQjqjwqXRhYB5nNt_Sni5Nx6KMC4DDJPnw?e=vayq2E)), [training parameters](https://github.com/scu-zjz/ForensicHub/tree/master/ForensicHub/statics/crossdataset_image), and [hardware specifications](https://arxiv.org/pdf/2505.11003).
 
-Checkpoints for Document Benchmark: https://pan.baidu.com/s/13ViyJebu12I0GN3BucBQrg?pwd=npkx
-Checkpoints for AIGC Benchmark: https://pan.baidu.com/s/11Jr2wjp6lAz9IBNWnbHlVg?pwd=kzhf
+Checkpoints for Document Benchmark: https://pan.baidu.com/s/13ViyJebu12I0GN3BucBQrg?pwd=npkx or https://drive.google.com/drive/folders/1RZZxwYIX5e-lHKDw1CD45FwFC0QqJ7im?usp=sharing
 
-Pretrained backbone weights for Document models: https://pan.baidu.com/s/1lsArVWzcJiADUcYYeqyClw?pwd=4gf4. Place the checkpoint under the corresponding model’s folder.
+Checkpoints for AIGC Benchmark: https://pan.baidu.com/s/11Jr2wjp6lAz9IBNWnbHlVg?pwd=kzhf or https://drive.google.com/drive/folders/1M-qe5xOblVZgKiBQ9j1Q-GQ4ao5VJMHZ?usp=sharing
+
+Pretrained backbone weights for Document models: https://pan.baidu.com/s/1lsArVWzcJiADUcYYeqyClw?pwd=4gf4 or https://drive.google.com/drive/folders/1NiHeRAcG2VkoN-JFgV5O_4YynQFiQWUw?usp=sharing. Place the checkpoint under the corresponding model’s folder.
 
 ## 🕵️‍♂️ Architecture   
 **ForensicHub provides four core modular components:** 
