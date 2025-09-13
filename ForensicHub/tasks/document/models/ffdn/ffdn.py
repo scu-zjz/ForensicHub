@@ -435,7 +435,9 @@ class FFDN(BaseModel):
         ce_loss = F.cross_entropy(pred, gt)
         return ce_loss, pred
 
-    def forward(self, image, DCT_coef, qtables, mask, **kwargs):
+    def forward(self, image, dct, qt, mask, **kwargs):
+        DCT_coef = dct
+        qtables = qt
         x = image
         mask = mask.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]
         DCT_coef = DCT_coef.squeeze(1).long()  # [B,1,H,W] -> [B,H,W]

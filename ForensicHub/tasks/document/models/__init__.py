@@ -9,3 +9,5 @@ _lazy_model_map = {
 _lazy_postfunc_map = {
     "dtd_post_func": "ForensicHub.tasks.document.models.dtd.dtd_post_function"
 }
+
+from .dtd.dtd_post_function import dtd_post_func
