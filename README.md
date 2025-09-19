@@ -2,7 +2,7 @@
 <img src="images/logo.jpg" alt="OSQ" style="width: 28%; min-width: 150px; display: block; margin: auto;">
 </p>
 
-# ForensicHub: A Unified Benchmark & Codebase for All-Domain Fake Image Detection and Localization
+# [NeurlPS 2025] ForensicHub: A Unified Benchmark & Codebase for All-Domain Fake Image Detection and Localization
 
 <div align="center">
 
