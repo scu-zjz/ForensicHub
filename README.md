@@ -31,7 +31,7 @@ intelligence-generated image detection (AIGC), and document image manipulation l
 benchmarking forensic models or building your own cross-domain pipelines, **ForensicHub** offers a flexible, configuration-driven
 architecture to streamline development, comparison, and analysis.
 
-## FIDL Leaderboard
+## 🏆 FIDL Leaderboard 🏆
 
 We make the FIDL leaderboard for unified ranking model's generalization across all domains. See [here](https://scu-zjz.github.io/ForensicHub-doc/rank/fidl_rank.html) for more details.
 
