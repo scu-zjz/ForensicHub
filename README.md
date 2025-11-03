@@ -31,6 +31,22 @@ intelligence-generated image detection (AIGC), and document image manipulation l
 benchmarking forensic models or building your own cross-domain pipelines, **ForensicHub** offers a flexible, configuration-driven
 architecture to streamline development, comparison, and analysis.
 
+## FIDL Leaderboard
+
+We make the FIDL leaderboard for unified ranking model's generalization across all domains. See [here](https://scu-zjz.github.io/ForensicHub-doc/rank/fidl_rank.html) for more details.
+
+<div align="center">
+
+| 🏆 Rank |     Model      | Deepfake 🖼️ | IMDL 📝 | AIGC 🤖 | Doc 📄 | Avg ⭐ |
+|:-------:|:--------------:|:---:|:---:|:---:|:---:|:---:|
+|  🥇 1   |     Effort     | 0.614 | 0.587 | 0.410 | 0.704 | 0.579 |
+|  🥈 2   |     UnivFD     | 0.534 | 0.486 | 0.463 | 0.699 | 0.545 |
+|  🥉 3   | ConvNeXT-small | 0.662 | 0.704 | 0.337 | 0.466 | 0.542 |
+|    4    |  Segformer-b3  | 0.596 | 0.567 | 0.342 | 0.334 | 0.460 |
+|   ...   |
+
+</div>
+
 ## 🚤Update
 - [2025.7.17] Released some missing pretrain weights for DocTamper Detection models, see this [issue](https://github.com/scu-zjz/ForensicHub/issues/9) for details.
 - [2025.7.11] We update to a *lazy-load version* of MODEL and POSTFUNC. The package will be checked when the model is actually used, which reduces unnecessary package installation. 
