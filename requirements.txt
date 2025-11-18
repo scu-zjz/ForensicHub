@@ -24,7 +24,6 @@ scikit_learn
 segmentation_models_pytorch
 setuptools
 six
-tensorflow
 timm
 torch
 torchvision
