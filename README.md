@@ -51,6 +51,7 @@ We make the FIDL leaderboard for unified ranking model's generalization across a
 </div>
 
 ## 🚤Update
+- [2026.6.8] Our proposed first unified fake image detection paradigm and comprehensive dataset, OpenMMSec, has been accepted by ICML 2026. The repository is available at: https://github.com/venus-guangjian/SICA_OpenMMSec.
 - [2025.7.17] Released some missing pretrain weights for DocTamper Detection models, see this [issue](https://github.com/scu-zjz/ForensicHub/issues/9) for details.
 - [2025.7.11] We update to a *lazy-load version* of MODEL and POSTFUNC. The package will be checked when the model is actually used, which reduces unnecessary package installation. 
 - [2025.7.10] Add a script for single image inference, see [Code](https://github.com/scu-zjz/ForensicHub/blob/master/ForensicHub/training_scripts/inference.py).
