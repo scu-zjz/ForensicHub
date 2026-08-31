@@ -25,8 +25,6 @@
 ---->
 🙋‍♂️Welcome to **ForensicHub**!   
 
-📝 **Blog**: [分久必合：统一的伪造图像检测（Unified FID）](https://knightzjz.github.io/blog/unified-fid.html) — a systematic discussion on why unifying fake image detection across the AIGC, Deepfake, IMDL and document forgery sub-domains matters, and where the field is heading.
-
 ForensicHub is the go-to benchmark and modular codebase for all-domain fake image detection and localization,
 covering deepfake detection (Deepfake), image manipulation detection and localization (IMDL), artificial
 intelligence-generated image detection (AIGC), and document image manipulation localization (Doc). Whether you're
