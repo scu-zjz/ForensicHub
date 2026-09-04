@@ -25,7 +25,7 @@
 ---->
 🙋‍♂️Welcome to **ForensicHub**!   
 
-📝 **Blog**: [分久必合：统一的伪造图像检测（Unified FID）](https://knightzjz.github.io/blog/unified-fid.html) / [English Version: *Long Divided, Must Unite*](https://knightzjz.github.io/blog/unified-fid-en.html) — an introduction to the Unified Fake Image Detection task and the discussion on why this task matters, and where the field is heading.
+📝 **Blog**: [分久必合：统一的伪造图像检测（Unified FID）](https://knightzjz.github.io/blog/unified-fid.html) / **Blog**: [Long Divided, Must Unite](https://knightzjz.github.io/blog/unified-fid-en.html) — an introduction to the Unified Fake Image Detection task and the discussion on why this task matters, and where the field is heading.
 
 ForensicHub is the go-to benchmark and modular codebase for all-domain fake image detection and localization,
 covering deepfake detection (Deepfake), image manipulation detection and localization (IMDL), artificial
